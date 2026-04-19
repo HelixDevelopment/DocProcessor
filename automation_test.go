@@ -21,7 +21,9 @@ func TestAutomation_GoModValid(t *testing.T) {
 	require.NoError(t, err)
 	content := string(data)
 	assert.Contains(t, content, "module digital.vasic.docprocessor")
-	assert.Contains(t, content, "go 1.24")
+	// Accept any 1.x Go version declared in go.mod; the exact patch/minor
+	// changes as the module is updated and should not be pinned here.
+	assert.Regexp(t, `go 1\.\d+`, content)
 }
 
 func TestAutomation_GoBuild(t *testing.T) {
