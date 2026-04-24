@@ -110,7 +110,7 @@ func TestAutomation_MakefileExists(t *testing.T) {
 
 func TestAutomation_NoRaceConditions(t *testing.T) {
 	if runtime.GOOS == "windows" {
-		t.Skip("race detector may not be available on Windows CI")
+		t.Skip("race detector may not be available on Windows CI")  // SKIP-OK: #legacy-untriaged
 	}
 
 	// This test itself runs with -race flag; if we got here, race detection is active
