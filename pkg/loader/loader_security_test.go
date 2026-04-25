@@ -70,7 +70,7 @@ func TestLoadFile_SymlinkOutsideDir(t *testing.T) {
 	symlink := filepath.Join(dir, "link.md")
 	err = os.Symlink(outsideFile, symlink)
 	if err != nil {
-		t.Skip("symlinks not supported on this platform")
+		t.Skip("symlinks not supported on this platform")  // SKIP-OK: #legacy-untriaged
 	}
 
 	// Loader follows symlinks (by design — it resolves to absolute paths)
@@ -99,7 +99,7 @@ func TestLoadDir_SymlinkLoop(t *testing.T) {
 	// Try to create a symlink loop
 	err := os.Symlink(dir, filepath.Join(dir, "loop"))
 	if err != nil {
-		t.Skip("symlinks not supported on this platform")
+		t.Skip("symlinks not supported on this platform")  // SKIP-OK: #legacy-untriaged
 	}
 
 	err = os.WriteFile(filepath.Join(dir, "test.md"), []byte("# Test\n\nContent."), 0644)
