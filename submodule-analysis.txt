@@ -1,0 +1,8 @@
+Commit: 8b83447dfe40b34250e1b089503d900e0885b96e
+Branch: HEAD
+8b83447 chore: bump Go version to 1.25
+35d7a92 Add GitHub Sponsors button
+6a52fb4 security: Add mandatory NO SUDO/ROOT execution constraint
+a6d47d5 docs: add architecture docs and README
+a3b1a6e chore: remove all CI/CD pipelines, add constitutional ban
+
