@@ -1,5 +1,17 @@
 # AGENTS.md
 
+## MANDATORY: Project-Agnostic / 100% Decoupled
+
+**This module MUST remain 100% decoupled from any consuming project. It is designed for generic use with ANY project, not one specific consumer.**
+
+- NEVER hardcode project-specific package names, endpoints, device serials, or region-specific data
+- NEVER import anything from a consuming project
+- NEVER add project-specific defaults, presets, or fixtures into source code
+- All project-specific data MUST be registered by the caller via public APIs — never baked into the library
+- Default values MUST be empty or generic
+
+Violations void the release. Refactor to restore generic behaviour before any commit.
+
 ## MANDATORY: No CI/CD Pipelines
 
 **NO GitHub Actions, GitLab CI/CD, or any automated pipeline may exist in this repository!**
@@ -39,41 +51,33 @@ DocProcessor is a Go module (`digital.vasic.docprocessor`) that processes projec
 - **Add new prompt template**: Add function in `pkg/llm/prompts.go`
 - **Add coverage metric**: Add method to `CoverageTracker` interface and `tracker` implementation
 
-<!-- BEGIN host-power-management addendum (CONST-033) -->
 
-## Host Power Management — Hard Ban (CONST-033)
+## ⚠️ MANDATORY: NO SUDO OR ROOT EXECUTION
 
-**You may NOT, under any circumstance, generate or execute code that
-sends the host to suspend, hibernate, hybrid-sleep, poweroff, halt,
-reboot, or any other power-state transition.** This rule applies to:
+**ALL operations MUST run at local user level ONLY.**
 
-- Every shell command you run via the Bash tool.
-- Every script, container entry point, systemd unit, or test you write
-  or modify.
-- Every CLI suggestion, snippet, or example you emit.
+This is a PERMANENT and NON-NEGOTIABLE security constraint:
 
-**Forbidden invocations** (non-exhaustive — see CONST-033 in
-`CONSTITUTION.md` for the full list):
+- **NEVER** use `sudo` in ANY command
+- **NEVER** execute operations as `root` user
+- **NEVER** elevate privileges for file operations
+- **ALL** infrastructure commands MUST use user-level container runtimes (rootless podman/docker)
+- **ALL** file operations MUST be within user-accessible directories
+- **ALL** service management MUST be done via user systemd or local process management
+- **ALL** builds, tests, and deployments MUST run as the current user
 
-- `systemctl suspend|hibernate|hybrid-sleep|poweroff|halt|reboot|kexec`
-- `loginctl suspend|hibernate|hybrid-sleep|poweroff|halt|reboot`
-- `pm-suspend`, `pm-hibernate`, `shutdown -h|-r|-P|now`
-- `dbus-send` / `busctl` calls to `org.freedesktop.login1.Manager.Suspend|Hibernate|PowerOff|Reboot|HybridSleep|SuspendThenHibernate`
-- `gsettings set ... sleep-inactive-{ac,battery}-type` to anything but `'nothing'` or `'blank'`
+### Why This Matters
+- **Security**: Prevents accidental system-wide damage
+- **Reproducibility**: User-level operations are portable across systems
+- **Safety**: Limits blast radius of any issues
+- **Best Practice**: Modern container workflows are rootless by design
 
-The host runs mission-critical parallel CLI agents and container
-workloads. Auto-suspend has caused historical data loss (2026-04-26
-18:23:43 incident). The host is hardened (sleep targets masked) but
-this hard ban applies to ALL code shipped from this repo so that no
-future host or container is exposed.
+### When You See SUDO
+If any script or command suggests using `sudo`:
+1. STOP immediately
+2. Find a user-level alternative
+3. Use rootless container runtimes
+4. Modify commands to work within user permissions
 
-**Defence:** every project ships
-`scripts/host-power-management/check-no-suspend-calls.sh` (static
-scanner) and
-`challenges/scripts/no_suspend_calls_challenge.sh` (challenge wrapper).
-Both MUST be wired into the project's CI / `run_all_challenges.sh`.
-
-**Full background:** `docs/HOST_POWER_MANAGEMENT.md` and `CONSTITUTION.md` (CONST-033).
-
-<!-- END host-power-management addendum (CONST-033) -->
+**VIOLATION OF THIS CONSTRAINT IS STRICTLY PROHIBITED.**
 

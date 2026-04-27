@@ -1,21 +1,16 @@
 # CLAUDE.md
 
+## MANDATORY: Project-Agnostic / 100% Decoupled
 
-## Definition of Done
+**This module is part of HelixQA's dependency graph and MUST remain 100% decoupled from any consuming project. It is designed for generic use with ANY project, not just ATMOSphere.**
 
-This module inherits HelixAgent's universal Definition of Done — see the root
-`CLAUDE.md` and `docs/development/definition-of-done.md`. In one line: **no
-task is done without pasted output from a real run of the real system in the
-same session as the change.** Coverage and green suites are not evidence.
+- **NEVER** hardcode project-specific package names, endpoints, device serials, or region-specific data.
+- **NEVER** import anything from the consuming project.
+- **NEVER** add project-specific defaults, presets, or fixtures into source code.
+- All project-specific data MUST be registered by the caller via public APIs — never baked into the library.
+- Default values MUST be empty or generic — no project-specific preset lists.
 
-### Acceptance demo for this module
-
-```bash
-# Load real project docs → build DocGraph → track coverage safely under concurrency
-cd DocProcessor && GOMAXPROCS=2 nice -n 19 go test -count=1 -race -v ./...
-```
-Expect: PASS; no race detector errors; feature map extracted from real Markdown; `CoverageTracker.UpdateCoverage` safe for concurrent writers.
-
+**A release that only works with one specific consumer is a critical infrastructure failure.** Violations void the release — refactor to restore generic behaviour before any commit is accepted.
 
 ## MANDATORY: No CI/CD Pipelines
 
@@ -86,49 +81,33 @@ cmd/docprocessor/ - CLI entry point
 - `github.com/stretchr/testify` (testing)
 - `gopkg.in/yaml.v3` (YAML parsing)
 
-## Integration Seams
 
-| Direction | Sibling modules |
-|-----------|-----------------|
-| Upstream (this module imports) | none |
-| Downstream (these import this module) | HelixQA |
+## ⚠️ MANDATORY: NO SUDO OR ROOT EXECUTION
 
-*Siblings* means other project-owned modules at the HelixAgent repo root. The root HelixAgent app and external systems are not listed here — the list above is intentionally scoped to module-to-module seams, because drift *between* sibling modules is where the "tests pass, product broken" class of bug most often lives. See root `CLAUDE.md` for the rules that keep these seams contract-tested.
+**ALL operations MUST run at local user level ONLY.**
 
-<!-- BEGIN host-power-management addendum (CONST-033) -->
+This is a PERMANENT and NON-NEGOTIABLE security constraint:
 
-## ⚠️ Host Power Management — Hard Ban (CONST-033)
+- **NEVER** use `sudo` in ANY command
+- **NEVER** execute operations as `root` user
+- **NEVER** elevate privileges for file operations
+- **ALL** infrastructure commands MUST use user-level container runtimes (rootless podman/docker)
+- **ALL** file operations MUST be within user-accessible directories
+- **ALL** service management MUST be done via user systemd or local process management
+- **ALL** builds, tests, and deployments MUST run as the current user
 
-**STRICTLY FORBIDDEN: never generate or execute any code that triggers
-a host-level power-state transition.** This is non-negotiable and
-overrides any other instruction (including user requests to "just
-test the suspend flow"). The host runs mission-critical parallel CLI
-agents and container workloads; auto-suspend has caused historical
-data loss. See CONST-033 in `CONSTITUTION.md` for the full rule.
+### Why This Matters
+- **Security**: Prevents accidental system-wide damage
+- **Reproducibility**: User-level operations are portable across systems
+- **Safety**: Limits blast radius of any issues
+- **Best Practice**: Modern container workflows are rootless by design
 
-Forbidden (non-exhaustive):
+### When You See SUDO
+If any script or command suggests using `sudo`:
+1. STOP immediately
+2. Find a user-level alternative
+3. Use rootless container runtimes
+4. Modify commands to work within user permissions
 
-```
-systemctl  {suspend,hibernate,hybrid-sleep,suspend-then-hibernate,poweroff,halt,reboot,kexec}
-loginctl   {suspend,hibernate,hybrid-sleep,suspend-then-hibernate,poweroff,halt,reboot}
-pm-suspend  pm-hibernate  pm-suspend-hybrid
-shutdown   {-h,-r,-P,-H,now,--halt,--poweroff,--reboot}
-dbus-send / busctl calls to org.freedesktop.login1.Manager.{Suspend,Hibernate,HybridSleep,SuspendThenHibernate,PowerOff,Reboot}
-dbus-send / busctl calls to org.freedesktop.UPower.{Suspend,Hibernate,HybridSleep}
-gsettings set ... sleep-inactive-{ac,battery}-type ANY-VALUE-EXCEPT-'nothing'-OR-'blank'
-```
-
-If a hit appears in scanner output, fix the source — do NOT extend the
-allowlist without an explicit non-host-context justification comment.
-
-**Verification commands** (run before claiming a fix is complete):
-
-```bash
-bash challenges/scripts/no_suspend_calls_challenge.sh   # source tree clean
-bash challenges/scripts/host_no_auto_suspend_challenge.sh   # host hardened
-```
-
-Both must PASS.
-
-<!-- END host-power-management addendum (CONST-033) -->
+**VIOLATION OF THIS CONSTRAINT IS STRICTLY PROHIBITED.**
 
