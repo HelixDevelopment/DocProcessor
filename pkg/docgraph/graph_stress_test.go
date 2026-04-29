@@ -48,6 +48,7 @@ func TestConcurrentAddEdges(t *testing.T) {
 }
 
 func TestConcurrentReadWrite(t *testing.T) {
+	// bluff-scan: no-assert-ok (concurrency test — go test -race catches data races; absence of panic == correctness)
 	g := New()
 	for i := 0; i < 20; i++ {
 		g.AddNode(fmt.Sprintf("node-%d", i), fmt.Sprintf("Title %d", i))
@@ -80,6 +81,7 @@ func TestConcurrentReadWrite(t *testing.T) {
 }
 
 func TestConcurrentExport(t *testing.T) {
+	// bluff-scan: no-assert-ok (concurrency test — go test -race catches data races; absence of panic == correctness)
 	g := New()
 	for i := 0; i < 30; i++ {
 		g.AddNode(fmt.Sprintf("node-%d", i), fmt.Sprintf("Title %d", i))

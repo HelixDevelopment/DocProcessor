@@ -105,6 +105,7 @@ func TestConcurrentMixedOperations(t *testing.T) {
 }
 
 func TestConcurrentExport(t *testing.T) {
+	// bluff-scan: no-assert-ok (concurrency test — go test -race catches data races; absence of panic == correctness)
 	tracker := NewTracker()
 	for i := 0; i < 20; i++ {
 		tracker.RegisterFeature(
