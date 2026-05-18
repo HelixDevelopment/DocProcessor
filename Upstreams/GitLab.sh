@@ -1,3 +1,3 @@
 #!/bin/bash
 
-export UPSTREAMABLE_REPOSITORY="git@gitlab.com:vasic-digital/Auth.git"
+export UPSTREAMABLE_REPOSITORY="git@gitlab.com:helixdevelopment1/docprocessor.git"
