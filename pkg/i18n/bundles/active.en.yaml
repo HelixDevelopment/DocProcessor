@@ -7,16 +7,20 @@
 # server messages, library error chains exposed to operators, etc.).
 #
 # CONST-046 (no-hardcoded-content) lineage:
-# - Round 73 (2026-05-13) audit identified these 5 CLI lines as
-#   hardcoded English deferred per round 29 prior decision.
-# - Round 97 (2026-05-18) migrated them per Phase 3 of the round-90
-#   i18n architecture design (docs/superpowers/specs/
-#   2026-05-19-const046-i18n-architecture-design.md).
+# - Round 73 (2026-05-13) audit identified the original 5 CLI lines
+#   as hardcoded English deferred per round 29 prior decision.
+# - Round 97 (2026-05-18) migrated 8 message IDs (rows 19-26 below)
+#   per Phase 3 of the round-90 i18n architecture design
+#   (docs/superpowers/specs/2026-05-19-const046-i18n-architecture-design.md).
+# - Round 209 (2026-05-19) added 10 more message IDs (rows 28-37
+#   below) covering CLI UX gaps: startup banner, path validation,
+#   path-resolution error, no-docs-found, format summary, summary
+#   header, per-feature/screen/workflow verbose lines, done line.
 #
 # Placeholders use `{{.name}}` style; consuming Translator
 # implementations may pick any template engine compatible with that
 # arg map.
-docprocessor_cli_usage: "Usage: docprocessor <docs-directory>"
+docprocessor_cli_usage: "Usage: docprocessor [--verbose] <docs-directory>"
 docprocessor_cli_error_loading_docs: "Error loading docs: {{.error}}"
 docprocessor_cli_loaded_documents: "Loaded {{.count}} documents"
 docprocessor_cli_error_building_feature_map: "Error building feature map: {{.error}}"
@@ -24,3 +28,14 @@ docprocessor_cli_feature_map_summary: "Feature map: {{.features}} features, {{.s
 docprocessor_cli_doc_graph_summary: "Doc graph: {{.nodes}} nodes, {{.edges}} edges"
 docprocessor_cli_category_line: "  Category {{.category}}: {{.count}} features"
 docprocessor_cli_platform_line: "  Platform {{.platform}}: {{.count}} features"
+
+docprocessor_cli_help_header: "DocProcessor extracts a structured feature map from a directory of project documentation."
+docprocessor_cli_path_invalid: "Invalid docs-directory argument: {{.path}}"
+docprocessor_cli_error_resolving_path: "Error resolving path {{.path}}: {{.error}}"
+docprocessor_cli_no_docs_found: "No supported documents found under {{.path}} — nothing to process."
+docprocessor_cli_format_summary: "Scanning for formats: {{.formats}}"
+docprocessor_cli_summary_header: "=== Feature map summary ==="
+docprocessor_cli_feature_line: "  Feature [{{.id}}] {{.name}} (category: {{.category}})"
+docprocessor_cli_screen_line: "  Screen  [{{.id}}] {{.name}}"
+docprocessor_cli_workflow_line: "  Workflow[{{.id}}] {{.name}} ({{.steps}} steps)"
+docprocessor_cli_done: "Done in {{.elapsed_ms}} ms."
