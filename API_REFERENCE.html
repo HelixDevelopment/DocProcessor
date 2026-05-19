@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>API_REFERENCE</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+    /* CSS for syntax highlighting */
+    html { -webkit-text-size-adjust: 100%; }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      {   }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+    code span.at { color: #7d9029; } /* Attribute */
+    code span.bn { color: #40a070; } /* BaseN */
+    code span.bu { color: #008000; } /* BuiltIn */
+    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+    code span.ch { color: #4070a0; } /* Char */
+    code span.cn { color: #880000; } /* Constant */
+    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+    code span.dt { color: #902000; } /* DataType */
+    code span.dv { color: #40a070; } /* DecVal */
+    code span.er { color: #ff0000; font-weight: bold; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #40a070; } /* Float */
+    code span.fu { color: #06287e; } /* Function */
+    code span.im { color: #008000; font-weight: bold; } /* Import */
+    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+    code span.op { color: #666666; } /* Operator */
+    code span.ot { color: #007020; } /* Other */
+    code span.pp { color: #bc7a00; } /* Preprocessor */
+    code span.sc { color: #4070a0; } /* SpecialChar */
+    code span.ss { color: #bb6688; } /* SpecialString */
+    code span.st { color: #4070a0; } /* String */
+    code span.va { color: #19177c; } /* Variable */
+    code span.vs { color: #4070a0; } /* VerbatimString */
+    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">API_REFERENCE</h1>
+</header>
+<h1 id="api-reference">API Reference</h1>
+<h2 id="package-pkgloader">Package: pkg/loader</h2>
+<h3 id="types">Types</h3>
+<h4 id="document"><code>Document</code></h4>
+<div class="sourceCode" id="cb1"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Document <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    Path       <span class="dt">string</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>    Format     <span class="dt">string</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>    Title      <span class="dt">string</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    Content    <span class="dt">string</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    Sections   <span class="op">[]</span>Section</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    Links      <span class="op">[]</span><span class="dt">string</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    ModifiedAt time<span class="op">.</span>Time</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="section"><code>Section</code></h4>
+<div class="sourceCode" id="cb2"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Section <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    Title   <span class="dt">string</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>    Level   <span class="dt">int</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    Content <span class="dt">string</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    Line    <span class="dt">int</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="interfaces">Interfaces</h3>
+<h4 id="loader"><code>Loader</code></h4>
+<div class="sourceCode" id="cb3"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Loader <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    LoadDir<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> path <span class="dt">string</span><span class="op">)</span> <span class="op">([]</span>Document<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    LoadFile<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> path <span class="dt">string</span><span class="op">)</span> <span class="op">(</span>Document<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    SupportedFormats<span class="op">()</span> <span class="op">[]</span><span class="dt">string</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="functions">Functions</h3>
+<ul>
+<li><code>NewDefaultLoader(formats []string) *DefaultLoader</code> --
+Create a loader for the given file extensions.</li>
+</ul>
+<h3 id="constants">Constants</h3>
+<ul>
+<li><code>MaxFileSize = 10 * 1024 * 1024</code> -- Maximum file size (10
+MB).</li>
+</ul>
+<hr />
+<h2 id="package-pkgfeature">Package: pkg/feature</h2>
+<h3 id="types-1">Types</h3>
+<h4 id="feature"><code>Feature</code></h4>
+<div class="sourceCode" id="cb4"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Feature <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    ID<span class="op">,</span> Name<span class="op">,</span> Description <span class="dt">string</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    Category              FeatureCategory</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    Platforms             <span class="op">[]</span><span class="dt">string</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    Priority              <span class="dt">string</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    Screens               <span class="op">[]</span><span class="dt">string</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    TestSteps             <span class="op">[]</span>TestStep</span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    SourceDoc<span class="op">,</span> SourceSection <span class="dt">string</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="featuremap"><code>FeatureMap</code></h4>
+<div class="sourceCode" id="cb5"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> FeatureMap <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    Features       <span class="op">[]</span>Feature</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    Screens        <span class="op">[]</span>ExpectedScreen</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    Workflows      <span class="op">[]</span>Workflow</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    Categories     <span class="kw">map</span><span class="op">[</span>FeatureCategory<span class="op">][]</span>Feature</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    PlatformMatrix <span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">][]</span>Feature</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    DocGraph       <span class="op">*</span>docgraph<span class="op">.</span>DocGraph</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    GeneratedAt    time<span class="op">.</span>Time</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>    ProjectRoot    <span class="dt">string</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="featurecategory"><code>FeatureCategory</code></h4>
+<p>Constants: <code>CategoryFormat</code>, <code>CategoryUI</code>,
+<code>CategoryNetwork</code>, <code>CategorySettings</code>,
+<code>CategoryStorage</code>, <code>CategoryAuth</code>,
+<code>CategoryEditor</code>, <code>CategoryOther</code>.</p>
+<h3 id="interfaces-1">Interfaces</h3>
+<h4 id="featuremapbuilder"><code>FeatureMapBuilder</code></h4>
+<div class="sourceCode" id="cb6"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> FeatureMapBuilder <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    BuildFromDocs<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> docs <span class="op">[]</span>loader<span class="op">.</span>Document<span class="op">)</span> <span class="op">(*</span>FeatureMap<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    Enrich<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> fm <span class="op">*</span>FeatureMap<span class="op">,</span> agent llm<span class="op">.</span>LLMAgent<span class="op">)</span> <span class="dt">error</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    Merge<span class="op">(</span>maps <span class="op">...*</span>FeatureMap<span class="op">)</span> <span class="op">*</span>FeatureMap</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="functions-1">Functions</h3>
+<ul>
+<li><code>NewBuilder(projectRoot string) *DefaultBuilder</code></li>
+<li><code>NewFeatureMap(projectRoot string) *FeatureMap</code></li>
+<li><code>GenerateID(name string) string</code> -- Deterministic feature
+ID generation.</li>
+<li><code>AllCategories() []FeatureCategory</code></li>
+<li><code>ValidCategory(s string) bool</code></li>
+</ul>
+<h3 id="methods-on-featuremap">Methods on FeatureMap</h3>
+<ul>
+<li><code>AddFeature(f Feature)</code></li>
+<li><code>FeatureByID(id string) *Feature</code></li>
+<li><code>FeaturesForPlatform(platform string) []Feature</code></li>
+<li><code>FeaturesForCategory(category FeatureCategory) []Feature</code></li>
+</ul>
+<hr />
+<h2 id="package-pkgcoverage">Package: pkg/coverage</h2>
+<h3 id="types-2">Types</h3>
+<h4 id="coveragereport"><code>CoverageReport</code></h4>
+<div class="sourceCode" id="cb7"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> CoverageReport <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    Total<span class="op">,</span> Verified<span class="op">,</span> Failed<span class="op">,</span> Skipped<span class="op">,</span> Unverified <span class="dt">int</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    OverallPct <span class="dt">float64</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    ByPlatform <span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="dt">float64</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    ByCategory <span class="kw">map</span><span class="op">[</span><span class="dt">string</span><span class="op">]</span><span class="dt">float64</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    Issues     <span class="op">[]</span>Issue</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="evidence"><code>Evidence</code></h4>
+<div class="sourceCode" id="cb8"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Evidence <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    ScreenshotPath<span class="op">,</span> VideoPath<span class="op">,</span> LogPath<span class="op">,</span> Description <span class="dt">string</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    VideoOffset time<span class="op">.</span>Duration</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    Timestamp   time<span class="op">.</span>Time</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="issue"><code>Issue</code></h4>
+<div class="sourceCode" id="cb9"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Issue <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    Type<span class="op">,</span> Severity<span class="op">,</span> Title<span class="op">,</span> Description<span class="op">,</span> ScreenID <span class="dt">string</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    Evidence <span class="op">[]</span><span class="dt">string</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="verificationstate"><code>VerificationState</code></h4>
+<p>Constants: <code>StateUnverified</code>, <code>StateVerified</code>,
+<code>StateFailed</code>, <code>StateSkipped</code>.</p>
+<h3 id="interfaces-2">Interfaces</h3>
+<h4 id="coveragetracker"><code>CoverageTracker</code></h4>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> CoverageTracker <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    RegisterFeature<span class="op">(</span>f Feature<span class="op">,</span> platforms <span class="op">[]</span><span class="dt">string</span><span class="op">)</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    MarkVerified<span class="op">(</span>featureID<span class="op">,</span> platform <span class="dt">string</span><span class="op">,</span> evidence Evidence<span class="op">)</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    MarkFailed<span class="op">(</span>featureID<span class="op">,</span> platform <span class="dt">string</span><span class="op">,</span> issue Issue<span class="op">)</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    MarkSkipped<span class="op">(</span>featureID<span class="op">,</span> platform <span class="dt">string</span><span class="op">,</span> reason <span class="dt">string</span><span class="op">)</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    Coverage<span class="op">()</span> CoverageReport</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    CoverageByPlatform<span class="op">(</span>platform <span class="dt">string</span><span class="op">)</span> <span class="dt">float64</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    CoverageByCategory<span class="op">(</span>category <span class="dt">string</span><span class="op">)</span> <span class="dt">float64</span></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>    Unverified<span class="op">()</span> <span class="op">[]</span>Feature</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    Export<span class="op">()</span> CoverageSnapshot</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="functions-2">Functions</h3>
+<ul>
+<li><code>NewTracker() CoverageTracker</code></li>
+</ul>
+<hr />
+<h2 id="package-pkgdocgraph">Package: pkg/docgraph</h2>
+<h3 id="types-3">Types</h3>
+<h4 id="node"><code>Node</code></h4>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Node <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    ID    <span class="dt">string</span> <span class="st">`json:&quot;id&quot;`</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    Title <span class="dt">string</span> <span class="st">`json:&quot;title&quot;`</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h4 id="edge"><code>Edge</code></h4>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Edge <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    From <span class="dt">string</span> <span class="st">`json:&quot;from&quot;`</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    To   <span class="dt">string</span> <span class="st">`json:&quot;to&quot;`</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="functions-3">Functions</h3>
+<ul>
+<li><code>New() *DocGraph</code></li>
+<li><code>ImportJSON(data []byte) (*DocGraph, error)</code></li>
+</ul>
+<h3 id="methods-on-docgraph">Methods on DocGraph</h3>
+<ul>
+<li><code>AddNode(id, title string)</code></li>
+<li><code>AddEdge(from, to string)</code></li>
+<li><code>Nodes() []Node</code>, <code>Edges() []Edge</code></li>
+<li><code>NodeCount() int</code>, <code>EdgeCount() int</code></li>
+<li><code>HasNode(id string) bool</code>,
+<code>HasEdge(from, to string) bool</code></li>
+<li><code>Neighbors(id string) []string</code>,
+<code>IncomingEdges(id string) []string</code></li>
+<li><code>Export() GraphSnapshot</code></li>
+<li><code>ExportJSON() ([]byte, error)</code></li>
+<li><code>ExportMermaid() string</code></li>
+</ul>
+<hr />
+<h2 id="package-pkgllm">Package: pkg/llm</h2>
+<h3 id="interfaces-3">Interfaces</h3>
+<h4 id="llmagent"><code>LLMAgent</code></h4>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> LLMAgent <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    Summarize<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> text <span class="dt">string</span><span class="op">)</span> <span class="op">(</span><span class="dt">string</span><span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    ExtractFeatures<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> text <span class="dt">string</span><span class="op">)</span> <span class="op">([]</span>RawFeature<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    ClassifyFeature<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> feature RawFeature<span class="op">)</span> <span class="op">(</span>FeatureCategory<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>    InferScreens<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> features <span class="op">[]</span>Feature<span class="op">)</span> <span class="op">([]</span>ExpectedScreen<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    GenerateTestSteps<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> feature Feature<span class="op">)</span> <span class="op">([]</span>TestStep<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="functions-prompt-templates">Functions (Prompt Templates)</h3>
+<ul>
+<li><code>SummarizePrompt(text string) string</code></li>
+<li><code>ExtractFeaturesPrompt(text string) string</code></li>
+<li><code>ClassifyFeaturePrompt(feature RawFeature) string</code></li>
+<li><code>InferScreensPrompt(features []Feature) string</code></li>
+<li><code>GenerateTestStepsPrompt(feature Feature) string</code></li>
+</ul>
+<h3 id="constants-1">Constants</h3>
+<ul>
+<li><code>PromptVersion = "1.0.0"</code></li>
+</ul>
+<hr />
+<h2 id="package-pkgconfig">Package: pkg/config</h2>
+<h3 id="types-4">Types</h3>
+<h4 id="config"><code>Config</code></h4>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode go"><code class="sourceCode go"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> Config <span class="kw">struct</span> <span class="op">{</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    DocsRoot     <span class="dt">string</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>    AutoDiscover <span class="dt">bool</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    Formats      <span class="op">[]</span><span class="dt">string</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<h3 id="functions-4">Functions</h3>
+<ul>
+<li><code>DefaultConfig() *Config</code></li>
+<li><code>LoadFromEnv(path string) (*Config, error)</code></li>
+<li><code>LoadFromMap(env map[string]string) *Config</code></li>
+</ul>
+</body>
+</html>

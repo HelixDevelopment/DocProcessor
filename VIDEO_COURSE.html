@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>VIDEO_COURSE</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">VIDEO_COURSE</h1>
+</header>
+<h1 id="video-course-docprocessor-deep-dive">Video Course: DocProcessor
+Deep Dive</h1>
+<p>5-episode series covering DocProcessor from fundamentals to advanced
+usage.</p>
+<hr />
+<h2 id="episode-1-introduction--architecture-15-min">Episode 1:
+Introduction &amp; Architecture (15 min)</h2>
+<h3 id="script-outline">Script Outline</h3>
+<ol type="1">
+<li><p><strong>Opening</strong> (2 min)</p>
+<ul>
+<li>What is DocProcessor and why it exists</li>
+<li>Role in the HelixQA ecosystem</li>
+<li>Problem statement: manual QA doesn't scale</li>
+</ul></li>
+<li><p><strong>Architecture Overview</strong> (5 min)</p>
+<ul>
+<li>Package layout: loader, feature, coverage, docgraph, llm,
+config</li>
+<li>Processing pipeline visualization</li>
+<li>Thread safety design with RWMutex</li>
+</ul></li>
+<li><p><strong>Quick Start Demo</strong> (5 min)</p>
+<ul>
+<li>Clone and build</li>
+<li>Run CLI on sample docs</li>
+<li>Show feature map output</li>
+</ul></li>
+<li><p><strong>Key Design Decisions</strong> (3 min)</p>
+<ul>
+<li>LLMAgent injection (no hard dependencies)</li>
+<li>Deterministic feature IDs</li>
+<li>Heuristic fallback when no LLM</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="episode-2-document-loading--parsing-15-min">Episode 2: Document
+Loading &amp; Parsing (15 min)</h2>
+<h3 id="script-outline-1">Script Outline</h3>
+<ol type="1">
+<li><p><strong>Loader Interface</strong> (3 min)</p>
+<ul>
+<li><code>LoadDir</code>, <code>LoadFile</code>,
+<code>SupportedFormats</code></li>
+<li>Context cancellation support</li>
+<li>MaxFileSize protection</li>
+</ul></li>
+<li><p><strong>Markdown Parser</strong> (4 min)</p>
+<ul>
+<li>Heading extraction with regex</li>
+<li>Section content segmentation</li>
+<li>Link extraction and deduplication</li>
+</ul></li>
+<li><p><strong>YAML Parser</strong> (3 min)</p>
+<ul>
+<li>Generic unmarshalling</li>
+<li>Title extraction from <code>title</code> or <code>name</code>
+keys</li>
+<li>Section creation from top-level keys</li>
+</ul></li>
+<li><p><strong>Scanner Implementation</strong> (3 min)</p>
+<ul>
+<li>Recursive directory walking</li>
+<li>Hidden directory skipping</li>
+<li>Extension normalization (yml -&gt; yaml)</li>
+</ul></li>
+<li><p><strong>Security</strong> (2 min)</p>
+<ul>
+<li>Path traversal protection</li>
+<li>File size limits</li>
+<li>Malformed input handling</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="episode-3-feature-extraction--featuremap-15-min">Episode 3:
+Feature Extraction &amp; FeatureMap (15 min)</h2>
+<h3 id="script-outline-2">Script Outline</h3>
+<ol type="1">
+<li><p><strong>Feature Model</strong> (3 min)</p>
+<ul>
+<li>Feature struct: ID, Name, Category, Platforms, Priority</li>
+<li>FeatureCategory constants</li>
+<li>Deterministic ID generation</li>
+</ul></li>
+<li><p><strong>Heuristic Extraction</strong> (3 min)</p>
+<ul>
+<li>Section-based extraction</li>
+<li>Content length thresholds</li>
+<li>Default platform assignment</li>
+</ul></li>
+<li><p><strong>LLM-Powered Extraction</strong> (4 min)</p>
+<ul>
+<li>LLMAgent interface design</li>
+<li>Prompt templates with versioning</li>
+<li>ExtractFeatures, ClassifyFeature flow</li>
+</ul></li>
+<li><p><strong>FeatureMap Building</strong> (3 min)</p>
+<ul>
+<li>AddFeature with category/platform indexing</li>
+<li>DocGraph integration</li>
+<li>FeatureByID, FeaturesForPlatform queries</li>
+</ul></li>
+<li><p><strong>Merge &amp; Deduplication</strong> (2 min)</p>
+<ul>
+<li>Merging multiple feature maps</li>
+<li>ID-based deduplication</li>
+<li>DocGraph merging</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="episode-4-coverage-tracking-15-min">Episode 4: Coverage Tracking
+(15 min)</h2>
+<h3 id="script-outline-3">Script Outline</h3>
+<ol type="1">
+<li><p><strong>CoverageTracker Interface</strong> (3 min)</p>
+<ul>
+<li>RegisterFeature, MarkVerified, MarkFailed, MarkSkipped</li>
+<li>Coverage reports by platform and category</li>
+<li>Export for serialization</li>
+</ul></li>
+<li><p><strong>Thread-Safe Implementation</strong> (4 min)</p>
+<ul>
+<li>sync.RWMutex usage</li>
+<li>Read path: RLock for Coverage(), CoverageByPlatform(),
+Unverified()</li>
+<li>Write path: Lock for MarkVerified(), MarkFailed(),
+MarkSkipped()</li>
+</ul></li>
+<li><p><strong>Verification States</strong> (3 min)</p>
+<ul>
+<li>State machine: unverified -&gt; verified/failed/skipped</li>
+<li>State transitions and overwrites</li>
+<li>Evidence and Issue tracking</li>
+</ul></li>
+<li><p><strong>Reporting</strong> (3 min)</p>
+<ul>
+<li>CoverageReport aggregation</li>
+<li>Platform and category breakdowns</li>
+<li>Issue collection</li>
+</ul></li>
+<li><p><strong>Stress Testing</strong> (2 min)</p>
+<ul>
+<li>Concurrent verification from multiple platform workers</li>
+<li>Race condition detection</li>
+<li>High-contention scenarios</li>
+</ul></li>
+</ol>
+<hr />
+<h2 id="episode-5-docgraph--integration-15-min">Episode 5: DocGraph
+&amp; Integration (15 min)</h2>
+<h3 id="script-outline-4">Script Outline</h3>
+<ol type="1">
+<li><p><strong>DocGraph</strong> (4 min)</p>
+<ul>
+<li>Directed graph of document links</li>
+<li>Node and edge management</li>
+<li>Neighbor and incoming edge queries</li>
+</ul></li>
+<li><p><strong>Export Formats</strong> (3 min)</p>
+<ul>
+<li>JSON export and import (round-trip)</li>
+<li>Mermaid diagram generation</li>
+<li>ID sanitization for Mermaid</li>
+</ul></li>
+<li><p><strong>Full Pipeline Integration</strong> (4 min)</p>
+<ul>
+<li>Load -&gt; Parse -&gt; Extract -&gt; Build -&gt; Enrich -&gt;
+Track</li>
+<li>Mock LLMAgent for testing</li>
+<li>E2E test walkthrough</li>
+</ul></li>
+<li><p><strong>Configuration</strong> (2 min)</p>
+<ul>
+<li>.env file loading</li>
+<li>Default values</li>
+<li>Environment variable mapping</li>
+</ul></li>
+<li><p><strong>What's Next</strong> (2 min)</p>
+<ul>
+<li>HelixQA integration via bridge adapters</li>
+<li>LLMOrchestrator Agent -&gt; LLMAgent adapter</li>
+<li>Autonomous QA session pipeline</li>
+</ul></li>
+</ol>
+</body>
+</html>
