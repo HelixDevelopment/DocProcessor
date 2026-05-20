@@ -243,28 +243,60 @@
 <h1 id="docprocessor">DocProcessor</h1>
 <p>Documentation processing and feature map extraction for QA
 automation.</p>
+<p><a href="LICENSE"><img
+src="https://img.shields.io/badge/license-Apache%202.0-blue"
+alt="License" /></a> <a href="go.mod"><img
+src="https://img.shields.io/badge/go-1.25%2B-00ADD8"
+alt="Go Version" /></a> <a href="CONSTITUTION.md"><img
+src="https://img.shields.io/badge/anti--bluff-CONST--035-red"
+alt="Anti-Bluff" /></a> <a href="pkg/i18n/translator.go"><img
+src="https://img.shields.io/badge/i18n-CONST--046-green"
+alt="i18n" /></a></p>
 <h2 id="overview">Overview</h2>
-<p>DocProcessor is a standalone Go module that loads project
-documentation, builds structured feature maps, and tracks verification
-coverage. It is designed to work with LLM agents for intelligent feature
-extraction, but also includes heuristic-based extraction for offline
-use.</p>
+<p>DocProcessor is a <strong>standalone</strong>,
+<strong>project-not-aware</strong>, <strong>fully decoupled</strong> Go
+module (per CONST-051(B)) that loads project documentation, builds
+structured feature maps, and tracks verification coverage. It is
+designed to work with LLM agents for intelligent feature extraction, but
+also includes heuristic-based extraction for offline use.</p>
+<p><strong>Round 220 (2026-05-19) deep-doc + test-matrix
+enrichment.</strong> This README matches actual capability — every claim
+below is exercised by an automated test or Challenge script in this
+repository (per CONST-048 invariants 1, 3, 5, 6 and the §11.4 anti-bluff
+covenant).</p>
+<blockquote>
+<p>Verbatim 2026-05-19 operator mandate (CONST-049 §11.4.17): <em>"all
+existing tests and Challenges do work in anti-bluff manner - they MUST
+confirm that all tested codebase really works as expected! We had been
+in position that all tests do execute with success and all Challenges as
+well, but in reality the most of the features does not work and can't be
+used! This MUST NOT be the case and execution of tests and Challenges
+MUST guarantee the quality, the completition and full usability by end
+users of the product!"</em></p>
+</blockquote>
 <h2 id="quick-start">Quick Start</h2>
 <div class="sourceCode" id="cb1"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:vasic-digital/DocProcessor.git</span>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Clone (per CONST-056: install upstreams immediately if present)</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">git</span> clone git@github.com:HelixDevelopment/DocProcessor.git</span>
 <span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> DocProcessor</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Build</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> build ./...</span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Test</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> test ./... <span class="at">-race</span> <span class="at">-count</span><span class="op">=</span>1</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Run</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> run ./cmd/docprocessor /path/to/docs</span></code></pre></div>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">install_upstreams</span>                  <span class="co"># if Upstreams/ recipe dir present</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Build</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> build ./...</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Run unit + integration + stress + security + E2E + automation tests</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> test ./... <span class="at">-race</span> <span class="at">-count</span><span class="op">=</span>1</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Build the CLI</span></span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> build <span class="at">-o</span> bin/docprocessor ./cmd/docprocessor</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Run against a docs directory</span></span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/docprocessor</span> /path/to/docs              <span class="co"># terse summary</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">./bin/docprocessor</span> <span class="at">--verbose</span> /path/to/docs    <span class="co"># per-feature/screen/workflow lines</span></span></code></pre></div>
 <h2 id="architecture">Architecture</h2>
-<p>DocProcessor is organized into 6 packages:</p>
+<p>DocProcessor is organised into seven packages — six domain packages
+plus <code>pkg/i18n</code> for the CONST-046 string-externalisation
+contract:</p>
 <table>
 <thead>
 <tr>
@@ -275,7 +307,7 @@ class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="
 <tbody>
 <tr>
 <td><code>pkg/loader</code></td>
-<td>Document loading and parsing (Markdown, YAML, HTML, AsciiDoc,
+<td>Document loading + parsing (Markdown, YAML, HTML, AsciiDoc,
 RST)</td>
 </tr>
 <tr>
@@ -292,52 +324,303 @@ RST)</td>
 </tr>
 <tr>
 <td><code>pkg/llm</code></td>
-<td>LLMAgent interface and prompt templates</td>
+<td>LLMAgent interface + prompt templates (no hard dependency on any
+provider)</td>
 </tr>
 <tr>
 <td><code>pkg/config</code></td>
-<td>Configuration from .env files</td>
+<td>Configuration loading from <code>.env</code> files</td>
+</tr>
+<tr>
+<td><code>pkg/i18n</code></td>
+<td>Translator contract + NoopTranslator default (CONST-046
+no-hardcoded-content)</td>
 </tr>
 </tbody>
 </table>
 <h3 id="processing-pipeline">Processing Pipeline</h3>
 <pre><code>Load Docs -&gt; Parse Sections -&gt; Extract Features -&gt; Build FeatureMap -&gt; Enrich (LLM) -&gt; Track Coverage</code></pre>
 <ol type="1">
-<li><strong>Load &amp; Parse</strong> -- Scan project tree for
-documentation files</li>
-<li><strong>Extract Features</strong> -- Heuristic extraction or
-LLM-powered extraction</li>
-<li><strong>Build Feature Map</strong> -- Structured, queryable map with
-categories and platform matrix</li>
-<li><strong>Enrich</strong> -- LLM infers screens and generates test
-steps</li>
-<li><strong>Track Coverage</strong> -- Thread-safe per-platform
-verification tracking</li>
+<li><strong>Load &amp; Parse</strong> — scan project tree for
+documentation files in configured formats.</li>
+<li><strong>Extract Features</strong> — heuristic extraction (offline)
+or LLM-powered extraction.</li>
+<li><strong>Build Feature Map</strong> — structured, queryable map with
+categories + platform matrix.</li>
+<li><strong>Enrich</strong> — optional <code>LLMAgent</code> infers
+screens and generates test steps.</li>
+<li><strong>Track Coverage</strong> — thread-safe per-platform
+verification tracking.</li>
 </ol>
+<h2 id="cli-surface-round-209-grammar">CLI surface (round 209
+grammar)</h2>
+<pre><code>docprocessor [--verbose|-v] &lt;docs-directory&gt;</code></pre>
+<table>
+<thead>
+<tr>
+<th>Flag</th>
+<th>Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--verbose</code></td>
+<td>Emit per-feature / per-screen / per-workflow lines after the summary
+block.</td>
+</tr>
+<tr>
+<td><code>-v</code></td>
+<td>Alias for <code>--verbose</code>.</td>
+</tr>
+<tr>
+<td>(no flag)</td>
+<td>Terse summary: format-list, loaded-count, summary-header,
+feature-map/</td>
+</tr>
+<tr>
+<td></td>
+<td>doc-graph counts, per-category + per-platform lines, completion
+line.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wire-output-message-ids-const-046">Wire-output message IDs
+(CONST-046)</h3>
+<p>Every user-facing line is emitted via the injected
+<code>pkg/i18n.Translator</code>, never as a hardcoded English literal.
+The full message-ID catalogue:</p>
+<table>
+<thead>
+<tr>
+<th>Round</th>
+<th>Message ID</th>
+<th>Emitted when</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_usage</code></td>
+<td>argv &lt; 2 — usage line</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_error_loading_docs</code></td>
+<td>loader returns an error</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_loaded_documents</code></td>
+<td>loader returns N documents</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_error_building_feature_map</code></td>
+<td>feature builder returns an error</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_feature_map_summary</code></td>
+<td>summary block — F / S / W counts</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_doc_graph_summary</code></td>
+<td>summary block — nodes / edges</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_category_line</code></td>
+<td>per-category count line</td>
+</tr>
+<tr>
+<td>97</td>
+<td><code>docprocessor_cli_platform_line</code></td>
+<td>per-platform count line</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_help_header</code></td>
+<td>argv &lt; 2 — startup banner second line</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_path_invalid</code></td>
+<td>empty / whitespace-only docs-directory arg</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_error_resolving_path</code></td>
+<td><code>filepath.Abs</code> failure</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_no_docs_found</code></td>
+<td>loader returns 0 documents (was silent pre-209)</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_format_summary</code></td>
+<td>supported-formats line at run-start</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_summary_header</code></td>
+<td>summary section heading</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_feature_line</code></td>
+<td>per-feature line (verbose mode only)</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_screen_line</code></td>
+<td>per-screen line (verbose mode only)</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_workflow_line</code></td>
+<td>per-workflow line (verbose mode only)</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>docprocessor_cli_done</code></td>
+<td>completion line with elapsed ms</td>
+</tr>
+</tbody>
+</table>
+<p>All 18 IDs are present in
+<code>pkg/i18n/bundles/active.en.yaml</code> and asserted by
+<code>TestRunCLI_BundleContainsAllRound209MsgIDs</code> in
+<code>cmd/docprocessor/main_test.go</code>.</p>
 <h2 id="key-interfaces">Key Interfaces</h2>
 <ul>
-<li><code>loader.Loader</code> -- Load documents from filesystem</li>
-<li><code>feature.FeatureMapBuilder</code> -- Build feature maps from
+<li><code>loader.Loader</code> — load documents from filesystem</li>
+<li><code>feature.FeatureMapBuilder</code> — build feature maps from
 documents</li>
-<li><code>coverage.CoverageTracker</code> -- Track feature verification
+<li><code>coverage.CoverageTracker</code> — track feature verification
 status</li>
-<li><code>llm.LLMAgent</code> -- Injected LLM for intelligent extraction
+<li><code>llm.LLMAgent</code> — injected LLM for intelligent extraction
 (no hard dependency)</li>
+<li><code>i18n.Translator</code> — externalised user-facing strings
+(CONST-046)</li>
 </ul>
 <h2 id="configuration">Configuration</h2>
 <p>Copy <code>.env.example</code> to <code>.env</code> and
-customize:</p>
-<div class="sourceCode" id="cb3"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="va">HELIX_DOCS_ROOT</span><span class="op">=</span>./docs</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="va">HELIX_DOCS_AUTO_DISCOVER</span><span class="op">=</span>true</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="va">HELIX_DOCS_FORMATS</span><span class="op">=</span>md,yaml,html,adoc,rst</span></code></pre></div>
-<h2 id="testing">Testing</h2>
+customise:</p>
 <div class="sourceCode" id="cb4"><pre
-class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test          <span class="co"># Run tests</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test-race     <span class="co"># Run with race detection</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test-cover    <span class="co"># Run with coverage report</span></span></code></pre></div>
-<p>190+ tests across 6 test types: unit, integration, stress, security,
-E2E, automation.</p>
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="va">HELIX_DOCS_ROOT</span><span class="op">=</span>./docs</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="va">HELIX_DOCS_AUTO_DISCOVER</span><span class="op">=</span>true</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="va">HELIX_DOCS_FORMATS</span><span class="op">=</span>md,yaml,html,adoc,rst</span></code></pre></div>
+<blockquote>
+<p><strong>CONST-053 reminder.</strong> <code>.env</code> MUST be
+<code>chmod 600</code> and is git-ignored. Only
+<code>.env.example</code> (placeholder values) is committed.</p>
+</blockquote>
+<h2 id="testing">Testing</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test          <span class="co"># all tests</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test-race     <span class="co"># all tests with race detection</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="fu">make</span> test-cover    <span class="co"># all tests with coverage report (coverage.html)</span></span></code></pre></div>
+<p><strong>Test-type coverage (per CONST-050(B) 100%-test-type-coverage
+mandate):</strong></p>
+<table>
+<thead>
+<tr>
+<th>Test type</th>
+<th>File(s)</th>
+<th>Real-infra?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit</td>
+<td><code>pkg/**/*_test.go</code> (excluding suffix-tagged),
+<code>cmd/docprocessor/main_test.go</code></td>
+<td>n/a (mocks OK)</td>
+</tr>
+<tr>
+<td>Integration</td>
+<td><code>pkg/loader/loader_integration_test.go</code></td>
+<td>real fs</td>
+</tr>
+<tr>
+<td>Stress</td>
+<td><code>pkg/coverage/tracker_stress_test.go</code>,
+<code>pkg/docgraph/graph_stress_test.go</code>,</td>
+<td>real</td>
+</tr>
+<tr>
+<td></td>
+<td><code>pkg/loader/loader_stress_test.go</code></td>
+<td></td>
+</tr>
+<tr>
+<td>Security</td>
+<td><code>pkg/config/config_security_test.go</code>,
+<code>pkg/loader/loader_security_test.go</code>,</td>
+<td>real</td>
+</tr>
+<tr>
+<td></td>
+<td><code>security_test.go</code></td>
+<td></td>
+</tr>
+<tr>
+<td>E2E</td>
+<td><code>e2e_test.go</code></td>
+<td>real binary</td>
+</tr>
+<tr>
+<td>Automation</td>
+<td><code>automation_test.go</code></td>
+<td>real binary</td>
+</tr>
+<tr>
+<td>Challenge</td>
+<td><code>challenges/scripts/docprocessor_cli_challenge.sh</code> (round
+220) + 8 other Challenge scripts</td>
+<td>real binary</td>
+</tr>
+</tbody>
+</table>
+<p>Full per-test-file coverage matrix in <a
+href="docs/test-coverage.md"><code>docs/test-coverage.md</code></a>.</p>
+<h2 id="challenge-scripts">Challenge scripts</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/docprocessor_cli_challenge.sh    <span class="co"># round 220 — CLI end-to-end + paired mutation</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/chaos_failure_injection_challenge.sh</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/ddos_health_flood_challenge.sh</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/host_no_auto_suspend_challenge.sh</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/no_suspend_calls_challenge.sh</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/scaling_horizontal_challenge.sh</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/stress_sustained_load_challenge.sh</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/ui_terminal_interaction_challenge.sh</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> challenges/scripts/ux_end_to_end_flow_challenge.sh</span></code></pre></div>
+<p>Every Challenge captures positive runtime evidence per CONST-035 /
+Article XI §11.9 and the §11.4 anti-bluff covenant. A passing Challenge
+is a claim that the feature works end-to-end for an end user, not merely
+that the binary exited 0.</p>
+<h2 id="governance">Governance</h2>
+<ul>
+<li><a href="CONSTITUTION.md"><code>CONSTITUTION.md</code></a> —
+module-specific tightenings on top of the canonical root.</li>
+<li><a href="CLAUDE.md"><code>CLAUDE.md</code></a> — AI-agent operating
+manual (cascaded from constitution submodule per CONST-049).</li>
+<li><a href="AGENTS.md"><code>AGENTS.md</code></a> — generic agent
+manual peer of CLAUDE.md.</li>
+<li>Canonical root: <a
+href="https://github.com/HelixDevelopment/HelixConstitution">HelixConstitution</a>.</li>
+</ul>
+<h2 id="decoupling-guarantee-const-051b">Decoupling guarantee
+(CONST-051(B))</h2>
+<p>DocProcessor does NOT import any consuming-project namespace. The
+module ID is <code>digital.vasic.docprocessor</code>; no path under
+<code>pkg/**</code> or <code>cmd/**</code> references a specific
+consumer. Project-specific behaviour is injected at runtime via the
+<code>Translator</code>, <code>LLMAgent</code>, and <code>Config</code>
+contracts.</p>
 <h2 id="license">License</h2>
 <p>Apache License 2.0. See <a href="LICENSE">LICENSE</a>.</p>
 </body>

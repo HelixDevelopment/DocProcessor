@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="generator" content="pandoc" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
+  <title>test-coverage</title>
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    html {
+      color: #1a1a1a;
+      background-color: #fdfdfd;
+    }
+    body {
+      margin: 0 auto;
+      max-width: 36em;
+      padding-left: 50px;
+      padding-right: 50px;
+      padding-top: 50px;
+      padding-bottom: 50px;
+      hyphens: auto;
+      overflow-wrap: break-word;
+      text-rendering: optimizeLegibility;
+      font-kerning: normal;
+    }
+    @media (max-width: 600px) {
+      body {
+        font-size: 0.9em;
+        padding: 12px;
+      }
+      h1 {
+        font-size: 1.8em;
+      }
+    }
+    @media print {
+      html {
+        background-color: white;
+      }
+      body {
+        background-color: transparent;
+        color: black;
+        font-size: 12pt;
+      }
+      p, h2, h3 {
+        orphans: 3;
+        widows: 3;
+      }
+      h2, h3, h4 {
+        page-break-after: avoid;
+      }
+    }
+    p {
+      margin: 1em 0;
+    }
+    a {
+      color: #1a1a1a;
+    }
+    a:visited {
+      color: #1a1a1a;
+    }
+    img {
+      max-width: 100%;
+    }
+    svg {
+      height: auto;
+      max-width: 100%;
+    }
+    h1, h2, h3, h4, h5, h6 {
+      margin-top: 1.4em;
+    }
+    h5, h6 {
+      font-size: 1em;
+      font-style: italic;
+    }
+    h6 {
+      font-weight: normal;
+    }
+    ol, ul {
+      padding-left: 1.7em;
+      margin-top: 1em;
+    }
+    li > ol, li > ul {
+      margin-top: 0;
+    }
+    blockquote {
+      margin: 1em 0 1em 1.7em;
+      padding-left: 1em;
+      border-left: 2px solid #e6e6e6;
+      color: #606060;
+    }
+    code {
+      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+      font-size: 85%;
+      margin: 0;
+      hyphens: manual;
+    }
+    pre {
+      margin: 1em 0;
+      overflow: auto;
+    }
+    pre code {
+      padding: 0;
+      overflow: visible;
+      overflow-wrap: normal;
+    }
+    .sourceCode {
+     background-color: transparent;
+     overflow: visible;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #1a1a1a;
+      height: 1px;
+      margin: 1em 0;
+    }
+    table {
+      margin: 1em 0;
+      border-collapse: collapse;
+      width: 100%;
+      overflow-x: auto;
+      display: block;
+      font-variant-numeric: lining-nums tabular-nums;
+    }
+    table caption {
+      margin-bottom: 0.75em;
+    }
+    tbody {
+      margin-top: 0.5em;
+      border-top: 1px solid #1a1a1a;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      border-top: 1px solid #1a1a1a;
+      padding: 0.25em 0.5em 0.25em 0.5em;
+    }
+    td {
+      padding: 0.125em 0.5em 0.25em 0.5em;
+    }
+    header {
+      margin-bottom: 4em;
+      text-align: center;
+    }
+    #TOC li {
+      list-style: none;
+    }
+    #TOC ul {
+      padding-left: 1.3em;
+    }
+    #TOC > ul {
+      padding-left: 0;
+    }
+    #TOC a:not(:hover) {
+      text-decoration: none;
+    }
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    /* The extra [class] is a hack that increases specificity enough to
+       override a similar rule in reveal.js */
+    ul.task-list[class]{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      font-size: inherit;
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
+  </style>
+</head>
+<body>
+<header id="title-block-header">
+<h1 class="title">test-coverage</h1>
+</header>
+<h1 id="docprocessor--test-coverage-matrix">DocProcessor — Test Coverage
+Matrix</h1>
+<p><strong>Round 220 (2026-05-19)</strong> — per-test-file coverage
+matrix enumerating the seven test types CONST-050(B) demands for this
+module's domain (unit, integration, E2E, automation, security, stress,
+Challenge), the file-system location of each, the package or surface
+they cover, the kind of evidence they capture, and the paired-mutation
+guard (per §1.1) that protects against the test itself silently
+degrading into a bluff.</p>
+<blockquote>
+<p>Verbatim 2026-05-19 operator mandate (CONST-049 §11.4.17): <em>"all
+existing tests and Challenges do work in anti-bluff manner - they MUST
+confirm that all tested codebase really works as expected! ... execution
+of tests and Challenges MUST guarantee the quality, the completition and
+full usability by end users of the product!"</em></p>
+</blockquote>
+<h2 id="1-coverage-matrix-real-surfaces-actually-exercised">1. Coverage
+matrix (real surfaces actually exercised)</h2>
+<table>
+<thead>
+<tr>
+<th>Test file</th>
+<th>Type</th>
+<th>Real surface exercised</th>
+<th>Captured evidence</th>
+<th>Paired mutation</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pkg/loader/loader_test.go</code></td>
+<td>Unit</td>
+<td><code>loader.NewDefaultLoader</code>, format detection, single-file
+load</td>
+<td>Loaded <code>Document</code> struct contents asserted</td>
+<td>Rename a supported format ext in <code>formats</code> slice →
+assertion fails</td>
+</tr>
+<tr>
+<td><code>pkg/loader/loader_integration_test.go</code></td>
+<td>Integration</td>
+<td><code>loader.LoadDir</code> against real temp dir tree</td>
+<td>Real fs file count + per-doc body</td>
+<td>Skip a file format in registry → loaded count drops</td>
+</tr>
+<tr>
+<td><code>pkg/loader/loader_security_test.go</code></td>
+<td>Security</td>
+<td>Path-traversal / symlink-escape / oversize-input rejection</td>
+<td>Rejected-path error message + no read attempted</td>
+<td>Remove path-canonicalisation step → traversal succeeds → test
+fails</td>
+</tr>
+<tr>
+<td><code>pkg/loader/loader_stress_test.go</code></td>
+<td>Stress</td>
+<td>Concurrent <code>LoadDir</code> invocations, large fanout</td>
+<td>No data race (<code>-race</code>) + per-iter timing</td>
+<td>Strip <code>sync.RWMutex</code> in loader → race detector trips</td>
+</tr>
+<tr>
+<td><code>pkg/loader/markdown.go</code> + parser tests</td>
+<td>Unit</td>
+<td>Markdown section parsing</td>
+<td>Parsed AST sections</td>
+<td>Truncate parser output → section count assertion fails</td>
+</tr>
+<tr>
+<td><code>pkg/feature/builder_test.go</code></td>
+<td>Unit</td>
+<td><code>BuildFromDocs</code> heuristic extraction</td>
+<td>Feature/Screen/Workflow counts + category map</td>
+<td>Remove 20-char heuristic gate → spurious features → count check
+fails</td>
+</tr>
+<tr>
+<td><code>pkg/feature/feature_test.go</code></td>
+<td>Unit</td>
+<td><code>Feature</code> struct invariants + equality</td>
+<td>Equality + JSON round-trip</td>
+<td>Drop a struct field → JSON round-trip diff fails</td>
+</tr>
+<tr>
+<td><code>pkg/feature/convert.go</code> tests</td>
+<td>Unit</td>
+<td>Doc → feature conversion</td>
+<td>Converted feature contents</td>
+<td>Skip category inference → category-map missing</td>
+</tr>
+<tr>
+<td><code>pkg/coverage/tracker_test.go</code></td>
+<td>Unit</td>
+<td><code>CoverageTracker</code> set/get per-platform</td>
+<td>Per-platform status map</td>
+<td>Replace RWMutex with no-op → concurrent get returns stale state</td>
+</tr>
+<tr>
+<td><code>pkg/coverage/tracker_stress_test.go</code></td>
+<td>Stress</td>
+<td>1000-goroutine concurrent set+get</td>
+<td>No data race + final state consistency</td>
+<td>Remove lock → race detector trips</td>
+</tr>
+<tr>
+<td><code>pkg/docgraph/graph_test.go</code></td>
+<td>Unit</td>
+<td><code>Graph.AddNode/AddEdge</code>, JSON + Mermaid export</td>
+<td>Exported JSON + Mermaid strings</td>
+<td>Skip Mermaid escaping → invalid syntax → diff fails</td>
+</tr>
+<tr>
+<td><code>pkg/docgraph/graph_stress_test.go</code></td>
+<td>Stress</td>
+<td>Concurrent node/edge insertion</td>
+<td>No data race + edge count</td>
+<td>Strip lock → race detector trips</td>
+</tr>
+<tr>
+<td><code>pkg/llm/prompts_test.go</code></td>
+<td>Unit</td>
+<td>Prompt template formatting</td>
+<td>Formatted prompt string</td>
+<td>Drop placeholder → assertion fails</td>
+</tr>
+<tr>
+<td><code>pkg/config/config_test.go</code></td>
+<td>Unit</td>
+<td><code>.env</code> parsing into <code>Config</code></td>
+<td>Parsed <code>Config</code> struct</td>
+<td>Skip default-value injection → defaults missing</td>
+</tr>
+<tr>
+<td><code>pkg/config/config_security_test.go</code></td>
+<td>Security</td>
+<td>Reject path-traversal in <code>HELIX_DOCS_ROOT</code></td>
+<td>Rejection error message</td>
+<td>Remove validation → traversal succeeds → test fails</td>
+</tr>
+<tr>
+<td><code>pkg/i18n/translator_test.go</code></td>
+<td>Unit</td>
+<td><code>NoopTranslator.T</code> + <code>TPlural</code> verbatim-ID
+semantics</td>
+<td>Returned-string equality with msg ID</td>
+<td>Make Noop return <code>""</code> → equality fails</td>
+</tr>
+<tr>
+<td><code>cmd/docprocessor/main_test.go</code></td>
+<td>Unit + E2E</td>
+<td><code>runCLI</code> direct invocation, 8 branch tests, bundle
+integrity</td>
+<td>Sentinel translations + forbidden-literal absence</td>
+<td>Drop verbose gate / remove a sentinel → bundle test or branch test
+fails</td>
+</tr>
+<tr>
+<td><code>e2e_test.go</code></td>
+<td>E2E</td>
+<td>Built binary executed against real temp tree</td>
+<td>Exit code + stdout/stderr captures</td>
+<td>Replace binary with <code>/bin/true</code> → sentinel check
+fails</td>
+</tr>
+<tr>
+<td><code>automation_test.go</code></td>
+<td>Automation</td>
+<td>Full doc-load → feature-build → coverage-track pipeline (real)</td>
+<td>Pipeline-output equality</td>
+<td>Skip enrichment step → output diff fails</td>
+</tr>
+<tr>
+<td><code>security_test.go</code></td>
+<td>Security</td>
+<td>Reject symlink-escape, oversize args, malformed env</td>
+<td>Rejection error + no execution</td>
+<td>Remove validation guard → test fails</td>
+</tr>
+<tr>
+<td><code>challenges/scripts/docprocessor_cli_challenge.sh</code></td>
+<td>Challenge</td>
+<td>Built binary against synthetic + empty docs dirs, both modes</td>
+<td>Captured wire output + exit code + paired mutation</td>
+<td><code>--anti-bluff-mutate</code> strips assertions → script returns
+99</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-anti-bluff-floor-per-const-035--article-xi-119">2. Anti-bluff
+floor (per CONST-035 / Article XI §11.9)</h2>
+<p>Every row above satisfies these four invariants:</p>
+<ol type="1">
+<li><strong>Positive captured evidence.</strong> The test/Challenge
+writes the actual wire output, file contents, or struct state it asserts
+on (no "no error returned therefore PASS" patterns).</li>
+<li><strong>Real-data exercise.</strong> Non-unit rows touch real
+filesystems, real binaries, real parsers — no mock loaders, no mock
+binaries.</li>
+<li><strong>Paired-mutation guard.</strong> Every gate has a paired
+mutation (last column) that, when applied, makes the test FAIL — proving
+the assertion catches the negation per §1.1.</li>
+<li><strong>CONST-046 wire-content check.</strong> Every CLI test
+asserts the translated sentinel appears AND the forbidden English
+literal does NOT (preventing accidental hardcoded-string
+regression).</li>
+</ol>
+<h2 id="3-coverage-of-const-050a--no-fakes-beyond-unit-tests">3.
+Coverage of CONST-050(A) — no fakes beyond unit tests</h2>
+<table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>Permitted fakes</th>
+<th>DocProcessor compliance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Unit</td>
+<td>mocks, stubs allowed</td>
+<td><code>fakeTranslator</code> lives in
+<code>cmd/docprocessor/main_test.go</code> (unit-only)</td>
+</tr>
+<tr>
+<td>Integration</td>
+<td>none</td>
+<td><code>loader_integration_test.go</code> writes real fs trees, no
+mocks</td>
+</tr>
+<tr>
+<td>E2E</td>
+<td>none</td>
+<td><code>e2e_test.go</code> invokes built binary, no mocks</td>
+</tr>
+<tr>
+<td>Automation</td>
+<td>none</td>
+<td><code>automation_test.go</code> runs real pipeline end-to-end</td>
+</tr>
+<tr>
+<td>Security</td>
+<td>none</td>
+<td><code>loader_security_test.go</code> /
+<code>config_security_test.go</code> use real inputs</td>
+</tr>
+<tr>
+<td>Stress</td>
+<td>none</td>
+<td><code>*_stress_test.go</code> use real concurrent goroutines +
+<code>-race</code></td>
+</tr>
+<tr>
+<td>Challenge</td>
+<td>none</td>
+<td><code>challenges/scripts/*.sh</code> invoke the built binary</td>
+</tr>
+</tbody>
+</table>
+<p>Production code (<code>pkg/**/*.go</code> not ending
+<code>_test.go</code>, <code>cmd/**/main.go</code>) is periodically
+swept for forbidden patterns
+(<code>grep -rn "simulated\|for now\|TODO implement\|placeholder" pkg cmd</code>);
+the sweep returns empty as of round 220.</p>
+<h2 id="4-coverage-of-const-046--no-hardcoded-content">4. Coverage of
+CONST-046 — no hardcoded content</h2>
+<p>The CLI is the only user-facing surface in this module; its eighteen
+wire strings are exhaustively gated by
+<code>cmd/docprocessor/main_test.go</code>:</p>
+<ul>
+<li>Eight branch tests assert each sentinel appears in the appropriate
+stream.</li>
+<li>Each branch test asserts the corresponding English literal does NOT
+appear (paired forbidden-literal check).</li>
+<li><code>TestRunCLI_BundleContainsAllRound209MsgIDs</code> asserts
+every msg ID exists in <code>pkg/i18n/bundles/active.en.yaml</code> —
+planting a typo in the bundle key makes the test fail (paired mutation:
+rename <code>docprocessor_cli_done</code> to
+<code>docprocessor_cli_done2</code> → test fails).</li>
+<li><code>TestRunCLI_NoopTranslator_EmitsMsgIDVerbatim</code> integrates
+the production <code>i18n.NoopTranslator</code> default to prove the
+verbatim-ID fallback path is itself captured (so absence-of-bundle is
+loudly visible per CONST-035).</li>
+</ul>
+<h2 id="5-how-to-add-a-new-test-that-satisfies-the-matrix">5. How to add
+a new test that satisfies the matrix</h2>
+<ol type="1">
+<li>Pick the layer (unit / integration / E2E / automation / security /
+stress / Challenge).</li>
+<li>Place the file in the canonical location (see §1).</li>
+<li>Capture positive runtime evidence (assert on actual struct contents,
+wire output, file system state — NOT on <code>err == nil</code>).</li>
+<li>Add a paired-mutation note to the §1 row.</li>
+<li>If the new test touches the CLI, add the new msg ID to both
+<code>pkg/i18n/bundles/active.en.yaml</code> AND the §1.4 list.</li>
+<li>Update <code>cmd/docprocessor/main.go</code> package doc with the
+new round number and msg-ID rationale.</li>
+<li>Run <code>go test ./... -race -count=1</code> AND the relevant
+Challenge script; confirm both green; capture the run output in your
+commit message.</li>
+</ol>
+<h2 id="6-round-history-of-test-matrix-growth">6. Round-history of
+test-matrix growth</h2>
+<table>
+<thead>
+<tr>
+<th>Round</th>
+<th>Date</th>
+<th>Net change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>97</td>
+<td>2026-04</td>
+<td>CONST-046 first migration — 8 CLI msg IDs externalised + tests</td>
+</tr>
+<tr>
+<td>209</td>
+<td>2026-05-19</td>
+<td>CONST-046 second migration — 10 additional CLI msg IDs + 7 new
+tests</td>
+</tr>
+<tr>
+<td>220</td>
+<td>2026-05-19</td>
+<td>docs/test-coverage.md + Challenge script (this document)</td>
+</tr>
+</tbody>
+</table>
+<h2 id="7-references">7. References</h2>
+<ul>
+<li>Root: <a href="../CONSTITUTION.md"><code>CONSTITUTION.md</code></a>,
+<a href="../CLAUDE.md"><code>CLAUDE.md</code></a>, <a
+href="../AGENTS.md"><code>AGENTS.md</code></a>.</li>
+<li>Anti-bluff covenant: §11.4 of the canonical constitution
+submodule.</li>
+<li>Test-type coverage mandate: CONST-050(B).</li>
+<li>No-hardcoded-content mandate: CONST-046.</li>
+<li>Decoupling mandate: CONST-051(B).</li>
+</ul>
+</body>
+</html>
