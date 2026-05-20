@@ -1,0 +1,37 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Milos Vasic
+#
+# English message bundle for the docprocessor CLI (CONST-046).
+# Every user-facing string the binary prints lives here so a
+# non-English operator receives a localised rendering once a
+# matching <locale>.yaml bundle is added alongside this file.
+#
+# Placeholder syntax: {{.key}} — substituted from the args map
+# passed to Translator.T / TPlural at render time.
+
+cli_usage:
+  other: "Usage: docprocessor <docs-directory>"
+
+cli_error_loading_docs:
+  other: "Error loading docs: {{.err}}"
+
+cli_error_building_feature_map:
+  other: "Error building feature map: {{.err}}"
+
+cli_docs_loaded:
+  one: "Loaded {{.count}} document"
+  other: "Loaded {{.count}} documents"
+
+cli_feature_map_summary:
+  other: "Feature map: {{.features}} features, {{.screens}} screens, {{.workflows}} workflows"
+
+cli_doc_graph_summary:
+  other: "Doc graph: {{.nodes}} nodes, {{.edges}} edges"
+
+cli_category_line:
+  one: "  Category {{.category}}: {{.count}} feature"
+  other: "  Category {{.category}}: {{.count}} features"
+
+cli_platform_line:
+  one: "  Platform {{.platform}}: {{.count}} feature"
+  other: "  Platform {{.platform}}: {{.count}} features"

@@ -1,0 +1,34 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Milos Vasic
+#
+# Serbian (Latin) message bundle for the docprocessor CLI
+# (CONST-046). Demonstrates that the i18n seam genuinely localises
+# user-facing CLI output rather than only echoing English — a real
+# second locale is the anti-bluff proof that the seam works.
+
+cli_usage:
+  other: "Upotreba: docprocessor <direktorijum-dokumentacije>"
+
+cli_error_loading_docs:
+  other: "Greska pri ucitavanju dokumentacije: {{.err}}"
+
+cli_error_building_feature_map:
+  other: "Greska pri izgradnji mape funkcionalnosti: {{.err}}"
+
+cli_docs_loaded:
+  one: "Ucitan {{.count}} dokument"
+  other: "Ucitano dokumenata: {{.count}}"
+
+cli_feature_map_summary:
+  other: "Mapa funkcionalnosti: {{.features}} funkcionalnosti, {{.screens}} ekrana, {{.workflows}} tokova"
+
+cli_doc_graph_summary:
+  other: "Graf dokumentacije: {{.nodes}} cvorova, {{.edges}} grana"
+
+cli_category_line:
+  one: "  Kategorija {{.category}}: {{.count}} funkcionalnost"
+  other: "  Kategorija {{.category}}: {{.count}} funkcionalnosti"
+
+cli_platform_line:
+  one: "  Platforma {{.platform}}: {{.count}} funkcionalnost"
+  other: "  Platforma {{.platform}}: {{.count}} funkcionalnosti"
