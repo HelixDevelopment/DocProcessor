@@ -6,333 +6,490 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes" />
   <title>ARCHITECTURE</title>
   <style>
-    /* Default styles provided by pandoc.
-    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
-    */
-    html {
-      color: #1a1a1a;
-      background-color: #fdfdfd;
-    }
-    body {
-      margin: 0 auto;
-      max-width: 36em;
-      padding-left: 50px;
-      padding-right: 50px;
-      padding-top: 50px;
-      padding-bottom: 50px;
-      hyphens: auto;
-      overflow-wrap: break-word;
-      text-rendering: optimizeLegibility;
-      font-kerning: normal;
-    }
-    @media (max-width: 600px) {
-      body {
-        font-size: 0.9em;
-        padding: 12px;
-      }
-      h1 {
-        font-size: 1.8em;
-      }
-    }
-    @media print {
-      html {
-        background-color: white;
-      }
-      body {
-        background-color: transparent;
-        color: black;
-        font-size: 12pt;
-      }
-      p, h2, h3 {
-        orphans: 3;
-        widows: 3;
-      }
-      h2, h3, h4 {
-        page-break-after: avoid;
-      }
-    }
-    p {
-      margin: 1em 0;
-    }
-    a {
-      color: #1a1a1a;
-    }
-    a:visited {
-      color: #1a1a1a;
-    }
-    img {
-      max-width: 100%;
-    }
-    svg {
-      height: auto;
-      max-width: 100%;
-    }
-    h1, h2, h3, h4, h5, h6 {
-      margin-top: 1.4em;
-    }
-    h5, h6 {
-      font-size: 1em;
-      font-style: italic;
-    }
-    h6 {
-      font-weight: normal;
-    }
-    ol, ul {
-      padding-left: 1.7em;
-      margin-top: 1em;
-    }
-    li > ol, li > ul {
-      margin-top: 0;
-    }
-    blockquote {
-      margin: 1em 0 1em 1.7em;
-      padding-left: 1em;
-      border-left: 2px solid #e6e6e6;
-      color: #606060;
-    }
-    code {
-      font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
-      font-size: 85%;
-      margin: 0;
-      hyphens: manual;
-    }
-    pre {
-      margin: 1em 0;
-      overflow: auto;
-    }
-    pre code {
-      padding: 0;
-      overflow: visible;
-      overflow-wrap: normal;
-    }
-    .sourceCode {
-     background-color: transparent;
-     overflow: visible;
-    }
-    hr {
-      border: none;
-      border-top: 1px solid #1a1a1a;
-      height: 1px;
-      margin: 1em 0;
-    }
-    table {
-      margin: 1em 0;
-      border-collapse: collapse;
-      width: 100%;
-      overflow-x: auto;
-      display: block;
-      font-variant-numeric: lining-nums tabular-nums;
-    }
-    table caption {
-      margin-bottom: 0.75em;
-    }
-    tbody {
-      margin-top: 0.5em;
-      border-top: 1px solid #1a1a1a;
-      border-bottom: 1px solid #1a1a1a;
-    }
-    th {
-      border-top: 1px solid #1a1a1a;
-      padding: 0.25em 0.5em 0.25em 0.5em;
-    }
-    td {
-      padding: 0.125em 0.5em 0.25em 0.5em;
-    }
-    header {
-      margin-bottom: 4em;
-      text-align: center;
-    }
-    #TOC li {
-      list-style: none;
-    }
-    #TOC ul {
-      padding-left: 1.3em;
-    }
-    #TOC > ul {
-      padding-left: 0;
-    }
-    #TOC a:not(:hover) {
-      text-decoration: none;
-    }
-    code{white-space: pre-wrap;}
-    span.smallcaps{font-variant: small-caps;}
-    div.columns{display: flex; gap: min(4vw, 1.5em);}
-    div.column{flex: auto; overflow-x: auto;}
-    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-    /* The extra [class] is a hack that increases specificity enough to
-       override a similar rule in reveal.js */
-    ul.task-list[class]{list-style: none;}
-    ul.task-list li input[type="checkbox"] {
-      font-size: inherit;
-      width: 0.8em;
-      margin: 0 0.8em 0.2em -1.6em;
-      vertical-align: middle;
-    }
-    .display.math{display: block; text-align: center; margin: 0.5rem auto;}
-    /* CSS for syntax highlighting */
-    html { -webkit-text-size-adjust: 100%; }
-    pre > code.sourceCode { white-space: pre; position: relative; }
-    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-    pre > code.sourceCode > span:empty { height: 1.2em; }
-    .sourceCode { overflow: visible; }
-    code.sourceCode > span { color: inherit; text-decoration: inherit; }
-    div.sourceCode { margin: 1em 0; }
-    pre.sourceCode { margin: 0; }
-    @media screen {
-    div.sourceCode { overflow: auto; }
-    }
-    @media print {
-    pre > code.sourceCode { white-space: pre-wrap; }
-    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-    }
-    pre.numberSource code
-      { counter-reset: source-line 0; }
-    pre.numberSource code > span
-      { position: relative; left: -4em; counter-increment: source-line; }
-    pre.numberSource code > span > a:first-child::before
-      { content: counter(source-line);
-        position: relative; left: -1em; text-align: right; vertical-align: baseline;
-        border: none; display: inline-block;
-        -webkit-touch-callout: none; -webkit-user-select: none;
-        -khtml-user-select: none; -moz-user-select: none;
-        -ms-user-select: none; user-select: none;
-        padding: 0 4px; width: 4em;
-        color: #aaaaaa;
-      }
-    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-    div.sourceCode
-      {   }
-    @media screen {
-    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-    }
-    code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-    code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-    code span.at { color: #7d9029; } /* Attribute */
-    code span.bn { color: #40a070; } /* BaseN */
-    code span.bu { color: #008000; } /* BuiltIn */
-    code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-    code span.ch { color: #4070a0; } /* Char */
-    code span.cn { color: #880000; } /* Constant */
-    code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-    code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-    code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-    code span.dt { color: #902000; } /* DataType */
-    code span.dv { color: #40a070; } /* DecVal */
-    code span.er { color: #ff0000; font-weight: bold; } /* Error */
-    code span.ex { } /* Extension */
-    code span.fl { color: #40a070; } /* Float */
-    code span.fu { color: #06287e; } /* Function */
-    code span.im { color: #008000; font-weight: bold; } /* Import */
-    code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-    code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-    code span.op { color: #666666; } /* Operator */
-    code span.ot { color: #007020; } /* Other */
-    code span.pp { color: #bc7a00; } /* Preprocessor */
-    code span.sc { color: #4070a0; } /* SpecialChar */
-    code span.ss { color: #bb6688; } /* SpecialString */
-    code span.st { color: #4070a0; } /* String */
-    code span.va { color: #19177c; } /* Variable */
-    code span.vs { color: #4070a0; } /* VerbatimString */
-    code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-  </style>
+
+html {
+color: #1a1a1a;
+background-color: #fdfdfd;
+}
+body {
+margin: 0 auto;
+max-width: 36em;
+padding-left: 50px;
+padding-right: 50px;
+padding-top: 50px;
+padding-bottom: 50px;
+hyphens: auto;
+overflow-wrap: break-word;
+text-rendering: optimizeLegibility;
+font-kerning: normal;
+}
+@media (max-width: 600px) {
+body {
+font-size: 0.9em;
+padding: 12px;
+}
+h1 {
+font-size: 1.8em;
+}
+}
+@media print {
+html {
+background-color: white;
+}
+body {
+background-color: transparent;
+color: black;
+font-size: 12pt;
+}
+p, h2, h3 {
+orphans: 3;
+widows: 3;
+}
+h2, h3, h4 {
+page-break-after: avoid;
+}
+}
+p {
+margin: 1em 0;
+}
+a {
+color: #1a1a1a;
+}
+a:visited {
+color: #1a1a1a;
+}
+img {
+max-width: 100%;
+}
+svg {
+height: auto;
+max-width: 100%;
+}
+h1, h2, h3, h4, h5, h6 {
+margin-top: 1.4em;
+}
+h5, h6 {
+font-size: 1em;
+font-style: italic;
+}
+h6 {
+font-weight: normal;
+}
+ol, ul {
+padding-left: 1.7em;
+margin-top: 1em;
+}
+li > ol, li > ul {
+margin-top: 0;
+}
+blockquote {
+margin: 1em 0 1em 1.7em;
+padding-left: 1em;
+border-left: 2px solid #e6e6e6;
+color: #606060;
+}
+code {
+font-family: Menlo, Monaco, Consolas, 'Lucida Console', monospace;
+font-size: 85%;
+margin: 0;
+hyphens: manual;
+}
+pre {
+margin: 1em 0;
+overflow: auto;
+}
+pre code {
+padding: 0;
+overflow: visible;
+overflow-wrap: normal;
+}
+.sourceCode {
+background-color: transparent;
+overflow: visible;
+}
+hr {
+border: none;
+border-top: 1px solid #1a1a1a;
+height: 1px;
+margin: 1em 0;
+}
+table {
+margin: 1em 0;
+border-collapse: collapse;
+width: 100%;
+overflow-x: auto;
+display: block;
+font-variant-numeric: lining-nums tabular-nums;
+}
+table caption {
+margin-bottom: 0.75em;
+}
+tbody {
+margin-top: 0.5em;
+border-top: 1px solid #1a1a1a;
+border-bottom: 1px solid #1a1a1a;
+}
+th {
+border-top: 1px solid #1a1a1a;
+padding: 0.25em 0.5em 0.25em 0.5em;
+}
+td {
+padding: 0.125em 0.5em 0.25em 0.5em;
+}
+header {
+margin-bottom: 4em;
+text-align: center;
+}
+#TOC li {
+list-style: none;
+}
+#TOC ul {
+padding-left: 1.3em;
+}
+#TOC > ul {
+padding-left: 0;
+}
+#TOC a:not(:hover) {
+text-decoration: none;
+}
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+
+ul.task-list[class]{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+font-size: inherit;
+width: 0.8em;
+margin: 0 0.8em 0.2em -1.6em;
+vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
 </head>
 <body>
 <header id="title-block-header">
 <h1 class="title">ARCHITECTURE</h1>
 </header>
 <h1 id="docprocessor-architecture">DocProcessor Architecture</h1>
-<h2 id="overview">Overview</h2>
-<p>Go module (<code>digital.vasic.docprocessor</code>) for loading
-project documentation, building structured feature maps, and tracking
-verification coverage. Part of the HelixQA ecosystem -- provides the
-"what to test" knowledge base that drives autonomous QA sessions.</p>
-<h2 id="package-structure">Package Structure</h2>
-<pre><code>pkg/
-  loader/     -- Document loading (Markdown, YAML) with recursive directory scanning
-  feature/    -- Feature map building with categories, screens, and test steps
-  coverage/   -- Thread-safe verification tracking with evidence and issue reporting
-  docgraph/   -- Document relationship graph with JSON/Mermaid export
-  llm/        -- LLM agent interface for AI-assisted feature extraction
-  config/     -- Configuration from .env files
-cmd/
-  docprocessor/ -- CLI entry point</code></pre>
-<h2 id="document-processing-pipeline">Document Processing Pipeline</h2>
-<pre><code>Project docs (Markdown, YAML)
-       |
-  Loader.LoadDir(path)
-       |
-  []Document (parsed sections, links, metadata)
-       |
-  FeatureMapBuilder.Build(documents)
-    +-- LLMAgent.ExtractFeatures() (optional, AI-assisted)
-    +-- Category classification
-    +-- Screen association
-    +-- Test step generation
-       |
-  FeatureMap
-       |
-  CoverageTracker.Track(featureMap)
-    +-- Per-platform verification status
-    +-- Evidence collection (screenshots, videos, logs)
-    +-- Issue tracking
-       |
-  CoverageReport</code></pre>
-<h2 id="key-types">Key Types</h2>
-<h3 id="loader">Loader</h3>
-<p><code>Loader</code> interface with <code>LoadDir()</code> and
-<code>LoadFile()</code>. Parses Markdown into <code>Document</code>
-structs containing <code>Section</code> objects (title, level, content,
-line number) and extracted links. Supports Markdown and YAML formats.
-Max file size: 10 MB.</p>
-<h3 id="feature">Feature</h3>
-<p><code>Feature</code> has a deterministic ID
-(<code>GenerateID(name)</code> -- slug with hash suffix for long names),
-category, associated screen, and test steps. Eight categories: format,
-ui, network, settings, storage, auth, editor, other.</p>
-<p><code>FeatureMapBuilder</code> constructs a <code>FeatureMap</code>
-from documents, optionally using an <code>LLMAgent</code> to extract
-features from unstructured text.</p>
-<h3 id="coverage">Coverage</h3>
-<p><code>CoverageTracker</code> is thread-safe
-(<code>sync.RWMutex</code>). Tracks per-feature, per-platform
-verification state:</p>
+<p><strong>Module:</strong> <code>digital.vasic.docprocessor</code></p>
+<p>DocProcessor loads project documentation, extracts structured feature
+maps, tracks verification coverage, and builds inter-document link
+graphs. It is designed for injection into QA pipelines (e.g., HelixQA
+autonomous sessions) but also runs standalone via
+<code>cmd/docprocessor</code>.</p>
+<hr />
+<h2 id="package-overview">Package Overview</h2>
+<table>
+<thead>
+<tr>
+<th>Package</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pkg/loader</code></td>
+<td>Document discovery and parsing</td>
+</tr>
+<tr>
+<td><code>pkg/feature</code></td>
+<td>Feature extraction and FeatureMap construction</td>
+</tr>
+<tr>
+<td><code>pkg/coverage</code></td>
+<td>Thread-safe verification coverage tracking</td>
+</tr>
+<tr>
+<td><code>pkg/docgraph</code></td>
+<td>Inter-document link graph with export</td>
+</tr>
+<tr>
+<td><code>pkg/llm</code></td>
+<td>Injected LLM interface for intelligent extraction</td>
+</tr>
+<tr>
+<td><code>pkg/config</code></td>
+<td>Configuration from <code>.env</code> files</td>
+</tr>
+<tr>
+<td><code>pkg/i18n</code></td>
+<td><code>Translator</code> contract for CLI message localization</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="processing-pipeline">Processing Pipeline</h2>
+<pre class="mermaid"><code>flowchart LR
+    A[Filesystem Scan] --&gt; B[Loader]
+    B --&gt; C[Parse Sections]
+    C --&gt; D{LLMAgent?}
+    D -- yes --&gt; E[LLM Extraction]
+    D -- no --&gt; F[Heuristic Extraction]
+    E --&gt; G[FeatureMapBuilder]
+    F --&gt; G
+    G --&gt; H[FeatureMap]
+    H --&gt; I[CoverageTracker]
+    H --&gt; J[DocGraph]</code></pre>
+<ol type="1">
+<li><strong>Scan</strong> — <code>loader.Scanner</code> walks the
+project tree using the format list from <code>pkg/config</code>
+(<code>HELIX_DOCS_FORMATS</code> env var; defaults to
+<code>md, yaml, html, adoc, rst</code>) and the
+<code>HELIX_DOCS_ROOT</code> setting.</li>
+<li><strong>Load &amp; Parse</strong> — <code>loader.Loader</code> reads
+each file (max 10 MB), splits it into <code>Section</code> structs with
+headings, bodies, and cross-reference links. Active structured parsers
+exist for <strong>Markdown</strong> and <strong>YAML</strong> only;
+other accepted extensions are stored as raw content with the first line
+as the title.</li>
+<li><strong>Extract Features</strong> —
+<code>feature.FeatureMapBuilder</code> runs heuristic extraction by
+default. When an <code>llm.LLMAgent</code> is injected it calls
+<code>ExtractFeatures</code> on the agent and parses
+<code>RawFeature</code> responses.</li>
+<li><strong>Build FeatureMap</strong> — Extracted features are
+deduplicated (deterministic IDs via <code>GenerateID</code>),
+categorised, and assembled into a queryable <code>FeatureMap</code> with
+a platform matrix.</li>
+<li><strong>Enrich</strong> — The optional LLM pass infers UI screens
+and generates test step suggestions for each feature.</li>
+<li><strong>Track Coverage</strong> —
+<code>coverage.CoverageTracker</code> records per-platform verification
+status, stores <code>Evidence</code>, and produces
+<code>CoverageReport</code> snapshots.</li>
+</ol>
+<hr />
+<h2 id="loader-pipeline">Loader Pipeline</h2>
+<p><code>loader.Loader</code> accepts a root path and a format list.
+Internally it uses:</p>
 <ul>
-<li><strong>States</strong>: unverified, verified, failed, skipped</li>
-<li><strong>Evidence</strong>: screenshot path, video path + offset, log
-path, timestamp, description</li>
-<li><strong>Issues</strong>: type
-(visual/ux/accessibility/functional/performance/crash), severity,
-evidence links</li>
+<li><strong>Markdown parser</strong> — extracts ATX/setext headings and
+fenced code blocks.</li>
+<li><strong>YAML parser</strong> — unmarshals structured docs via
+<code>gopkg.in/yaml.v3</code>.</li>
 </ul>
-<p><code>CoverageReport</code> aggregates coverage percentages by
-platform and category.</p>
-<h3 id="docgraph">DocGraph</h3>
-<p>Directed graph of document relationships. Nodes are documents, edges
-are references (links between docs). Thread-safe via
-<code>sync.RWMutex</code>. Exports to JSON and Mermaid diagram
-format.</p>
-<h3 id="llm-agent">LLM Agent</h3>
-<p><code>LLMAgent</code> is an injected interface with no module-level
-dependency on LLMOrchestrator:</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> LLMAgent <span class="kw">interface</span> <span class="op">{</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    ExtractFeatures<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> doc Document<span class="op">)</span> <span class="op">([]</span>RawFeature<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
-<p>Prompt templates in <code>pkg/llm/prompts.go</code> guide the LLM to
-extract structured feature data from documentation.</p>
-<h2 id="key-design-decisions">Key Design Decisions</h2>
+<p>For other accepted extensions (html, adoc, rst) the loader stores raw
+content with the first line used as the document title and a single
+top-level section.</p>
+<p>All paths return <code>[]loader.Document</code> with
+<code>[]Section</code> slices.</p>
+<hr />
+<h2 id="feature-extraction">Feature Extraction</h2>
+<p><code>feature.FeatureMapBuilder</code> operates in two modes:</p>
 <ul>
-<li><strong>Interface injection</strong> for LLM: DocProcessor has zero
-dependency on LLMOrchestrator or any specific LLM SDK. The agent is
-provided at runtime.</li>
-<li><strong>Thread-safe tracking</strong>: Both
-<code>CoverageTracker</code> and <code>DocGraph</code> use
-<code>sync.RWMutex</code> because HelixQA updates them concurrently from
-multiple device test sessions.</li>
-<li><strong>Deterministic IDs</strong>: Feature IDs are derived from
-names via slugification + SHA256 hash suffix, ensuring stability across
-runs.</li>
-<li><strong>Max file size limit</strong>: 10 MB prevents memory
-exhaustion on accidentally included binary files.</li>
+<li><strong>Heuristic</strong> — Keyword scoring against section
+headings and bodies to assign a <code>FeatureCategory</code> and detect
+platform tags (android, web, desktop).</li>
+<li><strong>LLM-powered</strong> — Sends structured prompts to the
+injected <code>llm.LLMAgent</code> and deserialises the returned
+<code>[]RawFeature</code> slice into <code>Feature</code> structs.</li>
 </ul>
+<p>Feature IDs are deterministic: short names become slugs; long names
+are slug + 6-char SHA256 suffix, ensuring stable references across
+pipeline runs.</p>
+<h3 id="featurecategory-values">FeatureCategory values</h3>
+<p>The eight valid categories defined in
+<code>pkg/feature/feature.go</code> are:</p>
+<table>
+<thead>
+<tr>
+<th>Constant</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CategoryFormat</code></td>
+<td><code>format</code></td>
+</tr>
+<tr>
+<td><code>CategoryUI</code></td>
+<td><code>ui</code></td>
+</tr>
+<tr>
+<td><code>CategoryNetwork</code></td>
+<td><code>network</code></td>
+</tr>
+<tr>
+<td><code>CategorySettings</code></td>
+<td><code>settings</code></td>
+</tr>
+<tr>
+<td><code>CategoryStorage</code></td>
+<td><code>storage</code></td>
+</tr>
+<tr>
+<td><code>CategoryAuth</code></td>
+<td><code>auth</code></td>
+</tr>
+<tr>
+<td><code>CategoryEditor</code></td>
+<td><code>editor</code></td>
+</tr>
+<tr>
+<td><code>CategoryOther</code></td>
+<td><code>other</code></td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="coverage-tracking">Coverage Tracking</h2>
+<p><code>coverage.CoverageTracker</code> is fully thread-safe:</p>
+<ul>
+<li>Read paths (<code>Coverage</code>, <code>CoverageByPlatform</code>,
+<code>CoverageByCategory</code>, <code>Unverified</code>) use
+<code>sync.RWMutex.RLock()</code>.</li>
+<li>Write paths (<code>MarkVerified</code>, <code>MarkFailed</code>,
+<code>MarkSkipped</code>, <code>RegisterFeature</code>) use
+<code>Lock()</code>.</li>
+</ul>
+<p>A <code>CoverageReport</code> snapshot captures per-feature,
+per-platform status at a point in time and is serialisable to JSON for
+downstream consumers (e.g., HelixQA reporter).</p>
+<hr />
+<h2 id="docgraph">DocGraph</h2>
+<p><code>pkg/docgraph.DocGraph</code> maintains a directed graph of
+document nodes and typed edges (reference, include, related). It is
+protected by <code>sync.RWMutex</code> and can export to:</p>
+<ul>
+<li><strong>JSON</strong> — full node/edge list for programmatic
+consumers.</li>
+<li><strong>Mermaid</strong> — <code>flowchart LR</code> diagram for
+documentation embedding.</li>
+</ul>
+<hr />
+<h2 id="llmagent-interface">LLMAgent Interface</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode go"><code class="sourceCode go"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">type</span> LLMAgent <span class="kw">interface</span> <span class="op">{</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    ExtractFeatures<span class="op">(</span>ctx context<span class="op">.</span>Context<span class="op">,</span> text <span class="dt">string</span><span class="op">)</span> <span class="op">([]</span>RawFeature<span class="op">,</span> <span class="dt">error</span><span class="op">)</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="op">}</span></span></code></pre></div>
+<p>The interface carries no module-level dependency on LLMOrchestrator
+or any concrete provider. Callers inject a conforming implementation at
+construction time, keeping DocProcessor buildable and testable without
+any LLM credentials.</p>
+<p>The full <code>LLMAgent</code> interface in
+<code>pkg/llm/agent.go</code> also exposes <code>Summarize</code>,
+<code>ClassifyFeature</code>, <code>InferScreens</code>, and
+<code>GenerateTestSteps</code>; <code>ExtractFeatures</code> is the
+primary entry point for feature extraction.</p>
+<hr />
+<h2 id="key-exported-types">Key Exported Types</h2>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Package</th>
+<th>Role</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>Loader</code> (interface)</td>
+<td><code>pkg/loader</code></td>
+<td>Load documents from the filesystem</td>
+</tr>
+<tr>
+<td><code>DefaultLoader</code></td>
+<td><code>pkg/loader</code></td>
+<td>Concrete <code>Loader</code> implementation</td>
+</tr>
+<tr>
+<td><code>FeatureMapBuilder</code> (interface)</td>
+<td><code>pkg/feature</code></td>
+<td>Build and enrich <code>FeatureMap</code> from docs</td>
+</tr>
+<tr>
+<td><code>DefaultBuilder</code></td>
+<td><code>pkg/feature</code></td>
+<td>Concrete <code>FeatureMapBuilder</code> implementation</td>
+</tr>
+<tr>
+<td><code>CoverageTracker</code> (interface)</td>
+<td><code>pkg/coverage</code></td>
+<td>Thread-safe coverage tracking</td>
+</tr>
+<tr>
+<td><code>DocGraph</code></td>
+<td><code>pkg/docgraph</code></td>
+<td>Inter-document link graph</td>
+</tr>
+<tr>
+<td><code>LLMAgent</code> (interface)</td>
+<td><code>pkg/llm</code></td>
+<td>Injectable LLM for intelligent extraction</td>
+</tr>
+<tr>
+<td><code>Translator</code> (interface)</td>
+<td><code>pkg/i18n</code></td>
+<td>CLI message-localization contract</td>
+</tr>
+</tbody>
+</table>
 </body>
 </html>
