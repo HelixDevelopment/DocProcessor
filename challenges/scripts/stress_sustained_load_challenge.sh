@@ -3,7 +3,11 @@
 # for DocProcessor per CONST-035 + CONST-050(B). Cascade per CONST-051(A).
 
 set -uo pipefail
+<<<<<<< HEAD
 HEALTH_URL="${DOCPROCESSOR_HEALTH_URL:-}"
+=======
+HEALTH_URL="${DOCPROCESSOR_VD_HEALTH_URL:-}"
+>>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
 DURATION="${STRESS_DURATION_SEC:-15}"
 RPS="${STRESS_REQUESTS_PER_SEC:-50}"
 CONCURRENCY="${STRESS_CONCURRENCY:-20}"
@@ -15,7 +19,11 @@ echo "=== DocProcessor Stress Sustained-Load Challenge ==="
 echo "  url=$HEALTH_URL dur=${DURATION}s rps=${RPS}"
 
 if [[ -z "$HEALTH_URL" ]]; then
+<<<<<<< HEAD
     echo "[1/6] SKIP: DOCPROCESSOR_HEALTH_URL unset — SKIP-OK: #env-no-target"
+=======
+    echo "[1/6] SKIP: DOCPROCESSOR_VD_HEALTH_URL unset — SKIP-OK: #env-no-target"
+>>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
     echo "=== DocProcessor Stress Challenge: PASSED (SKIP-OK) ==="
     exit 0
 fi

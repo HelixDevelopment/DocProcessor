@@ -3,9 +3,15 @@
 # for DocProcessor per CONST-035 + CONST-050(B). Cascade per CONST-051(A).
 
 set -uo pipefail
+<<<<<<< HEAD
 HEALTH_URL="${DOCPROCESSOR_HEALTH_URL:-}"
 CHAOS_HOST="${DOCPROCESSOR_CHAOS_HOST:-localhost}"
 CHAOS_PORT="${DOCPROCESSOR_CHAOS_PORT:-}"
+=======
+HEALTH_URL="${DOCPROCESSOR_VD_HEALTH_URL:-}"
+CHAOS_HOST="${DOCPROCESSOR_VD_CHAOS_HOST:-localhost}"
+CHAOS_PORT="${DOCPROCESSOR_VD_CHAOS_PORT:-}"
+>>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
 LEGIT_REQS="${CHAOS_LEGIT_REQUESTS:-100}"
 MIN_PCT="${CHAOS_LEGIT_MIN_PASS_PCT:-95}"
 
@@ -13,7 +19,11 @@ echo "=== DocProcessor Chaos Failure-Injection Challenge ==="
 echo "  url=$HEALTH_URL host=${CHAOS_HOST}:${CHAOS_PORT}"
 
 if [[ -z "$HEALTH_URL" ]] || [[ -z "$CHAOS_PORT" ]]; then
+<<<<<<< HEAD
     echo "[1/6] SKIP: DOCPROCESSOR_HEALTH_URL/_PORT unset — SKIP-OK: #env-no-target"
+=======
+    echo "[1/6] SKIP: DOCPROCESSOR_VD_HEALTH_URL/_PORT unset — SKIP-OK: #env-no-target"
+>>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
     echo "=== DocProcessor Chaos Challenge: PASSED (SKIP-OK) ==="
     exit 0
 fi

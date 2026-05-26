@@ -3,7 +3,11 @@
 # DocProcessor per CONST-035 + CONST-050(B). Cascade per CONST-051(A).
 
 set -uo pipefail
+<<<<<<< HEAD
 BIN_PATH="${DOCPROCESSOR_BIN:-}"
+=======
+BIN_PATH="${DOCPROCESSOR_VD_BIN:-}"
+>>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
 TIMEOUT_SEC="${UX_TIMEOUT_SEC:-30}"
 USER_HOSTILE=('panic:' 'goroutine [0-9]+ \[running\]:' 'runtime error:' 'segmentation fault' 'fatal error:')
 
@@ -11,7 +15,11 @@ echo "=== DocProcessor UX End-to-End Flow Challenge ==="
 echo "  bin=$BIN_PATH timeout=${TIMEOUT_SEC}s"
 
 if [[ -z "$BIN_PATH" ]] || [[ ! -x "$BIN_PATH" ]]; then
+<<<<<<< HEAD
     echo "[1/5] SKIP: DOCPROCESSOR_BIN unset — SKIP-OK: #env-binary-missing"
+=======
+    echo "[1/5] SKIP: DOCPROCESSOR_VD_BIN unset — SKIP-OK: #env-binary-missing"
+>>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
     echo "=== DocProcessor UX Challenge: PASSED (SKIP-OK) ==="
     exit 0
 fi
