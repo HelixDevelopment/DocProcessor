@@ -396,7 +396,10 @@ Operating-mode capstone strengthening §11.4.87 + §11.4.94 + §11.4.96: (A) eve
 **Cascade requirement:** This anchor (verbatim or by `§11.4.95` reference) MUST appear in every owned submodule's `CONSTITUTION.md`, `CLAUDE.md`, and `AGENTS.md`. Propagation gate `CM-COVENANT-114-95-PROPAGATION`; paired mutation strips the literal → gate FAILs. Release blocker.
 **Canonical authority:** constitution submodule `Constitution.md` §11.4.95 for the full mandate.
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 0dda56a36e9c9abb5c8422cb2b7e691c6d9299cd
 ---
 
 ## §11.4.98 — Full-Automation Anti-Bluff Mandate (cascaded from constitution submodule §11.4.98)
@@ -429,6 +432,7 @@ In autonomous / endless-loop mode (per §11.4.87), the agent MUST minimize opera
 
 **Cascade requirement:** This anchor (verbatim or by `§11.4.101` reference) MUST appear in every owned submodule's `CONSTITUTION.md`, `CLAUDE.md`, and `AGENTS.md`. Propagation gate `CM-COVENANT-114-101-PROPAGATION`; paired mutation strips the literal → gate FAILs. Release blocker.
 **Canonical authority:** constitution submodule `Constitution.md` §11.4.101 for the full mandate.
+<<<<<<< HEAD
 
 
 ## §11.4.102 — Mandatory systematic-debugging activation + always-loaded skill-discovery + plugin-dependency availability (cascaded from constitution submodule §11.4.102)
@@ -439,3 +443,5 @@ Three cooperating invariants — the difference between guess-and-retry and inve
 
 **Cascade requirement:** This anchor (verbatim or by `§11.4.102` reference) MUST appear in every owned submodule's `CONSTITUTION.md`, `CLAUDE.md`, and `AGENTS.md`. Propagation gate `CM-COVENANT-114-102-PROPAGATION`; paired mutation strips the literal → gate FAILs. Release blocker.
 **Canonical authority:** constitution submodule `Constitution.md` §11.4.102 for the full mandate.
+=======
+>>>>>>> 0dda56a36e9c9abb5c8422cb2b7e691c6d9299cd
