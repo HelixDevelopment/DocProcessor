@@ -298,3 +298,36 @@ func TestRunCLI_BundleContainsAllRound209MsgIDs(t *testing.T) {
 		}
 	}
 }
+
+// TestNewTranslator_ProductionWiringRendersVisibleOutput is the §1.1
+// paired-mutation guard for main()'s production translator wiring. It
+// drives runCLI through the REAL translator returned by newTranslator()
+// (the same object main() hands runCLI) and asserts the usage branch
+// produces non-empty, ID-bearing stderr. The forbidden mutation this
+// catches: replacing newTranslator()'s return with a translator whose
+// T/TPlural return "" (an empty-string substitution would let every
+// runCLI line silently vanish — a §11.4 PASS-bluff at the i18n layer).
+// If newTranslator() is mutated to emit empty strings, the
+// non-empty + sentinel assertions below FAIL.
+func TestNewTranslator_ProductionWiringRendersVisibleOutput(t *testing.T) {
+	tr := newTranslator()
+	if tr == nil {
+		t.Fatal("newTranslator() returned nil — main() would panic dispatching runCLI")
+	}
+
+	var stdout, stderr bytes.Buffer
+	rc := runCLI(context.Background(), []string{"docprocessor"}, &stdout, &stderr, tr)
+	if rc != 1 {
+		t.Fatalf("runCLI(no-args) exit code = %d, want 1", rc)
+	}
+	if strings.TrimSpace(stderr.String()) == "" {
+		t.Fatalf("production translator produced empty stderr — i18n wiring is a no-op bluff")
+	}
+	// The production NoopTranslator echoes IDs verbatim as positive
+	// evidence per pkg/i18n's Article XI §11.9 contract.
+	for _, id := range []string{"docprocessor_cli_usage", "docprocessor_cli_help_header"} {
+		if !strings.Contains(stderr.String(), id) {
+			t.Fatalf("production stderr missing rendered msg ID %q; got %q", id, stderr.String())
+		}
+	}
+}
