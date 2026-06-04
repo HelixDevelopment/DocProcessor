@@ -42,6 +42,82 @@ func TestBundleTranslator_ResolvesEnglish(t *testing.T) {
 	require.Equal(t, "Feature map: 5 features, 2 screens, 1 workflows", got)
 }
 
+// TestBundleTranslator_ResolvesFlatCLIBundle is the W6C RED→GREEN
+// proof. The docprocessor CLI (cmd/docprocessor) emits message IDs in
+// the `docprocessor_cli_*` namespace, which live ONLY in the FLAT
+// `active.en.yaml` surface (plain-string values, no {one,other}
+// nesting). Before W6C, BundleTranslator skipped every `active.*` file
+// outright, so these IDs never loaded and T() echoed the ID verbatim —
+// newTranslator therefore had to return NoopTranslator. This test
+// FAILS on that pre-fix code (T returns the ID) and PASSES once the
+// flat surface is merged into the locale map.
+//
+// RED proof (pre-fix): got "docprocessor_cli_usage" want the sentence.
+func TestBundleTranslator_ResolvesFlatCLIBundle(t *testing.T) {
+	tr, err := NewBundleTranslator("en")
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	// Plain (no-placeholder) flat key resolves to its real string.
+	got := tr.T(ctx, "docprocessor_cli_usage", nil)
+	require.Equal(t, "Usage: docprocessor [--verbose] <docs-directory>", got)
+	require.NotEqual(t, "docprocessor_cli_usage", got,
+		"flat CLI key must resolve, not echo verbatim (Noop behaviour)")
+
+	// Flat key with {{.error}} placeholder interpolates.
+	got = tr.T(ctx, "docprocessor_cli_error_loading_docs",
+		map[string]any{"error": "boom"})
+	require.Equal(t, "Error loading docs: boom", got)
+
+	// Flat key with multiple placeholders interpolates all of them.
+	got = tr.T(ctx, "docprocessor_cli_feature_map_summary", map[string]any{
+		"features": 5, "screens": 2, "workflows": 1,
+	})
+	require.Equal(t, "Feature map: 5 features, 2 screens, 1 workflows", got)
+
+	// A flat-namespace key the CLI uses but with NO locale-specific
+	// override still resolves via the default-locale (en) bundle.
+	got = tr.T(WithLocale(ctx, "sr"), "docprocessor_cli_done",
+		map[string]any{"elapsed_ms": 12})
+	require.Equal(t, "Done in 12 ms.", got,
+		"unknown-locale flat key must fall back to default, not echo")
+}
+
+// TestBundleTranslator_AllFlatCLIKeysResolve is the completeness gate
+// for the flat surface: every `docprocessor_cli_*` ID the CLI emits
+// MUST resolve (not echo) and render non-empty in the default locale.
+func TestBundleTranslator_AllFlatCLIKeysResolve(t *testing.T) {
+	tr, err := NewBundleTranslator("en")
+	require.NoError(t, err)
+	ctx := context.Background()
+
+	flatKeys := []string{
+		"docprocessor_cli_usage",
+		"docprocessor_cli_error_loading_docs",
+		"docprocessor_cli_loaded_documents",
+		"docprocessor_cli_error_building_feature_map",
+		"docprocessor_cli_feature_map_summary",
+		"docprocessor_cli_doc_graph_summary",
+		"docprocessor_cli_category_line",
+		"docprocessor_cli_platform_line",
+		"docprocessor_cli_help_header",
+		"docprocessor_cli_path_invalid",
+		"docprocessor_cli_error_resolving_path",
+		"docprocessor_cli_no_docs_found",
+		"docprocessor_cli_format_summary",
+		"docprocessor_cli_summary_header",
+		"docprocessor_cli_feature_line",
+		"docprocessor_cli_screen_line",
+		"docprocessor_cli_workflow_line",
+		"docprocessor_cli_done",
+	}
+	for _, k := range flatKeys {
+		got := tr.T(ctx, k, nil)
+		require.NotEqual(t, k, got, "flat key %q must resolve (not echo)", k)
+		require.NotEmpty(t, strings.TrimSpace(got), "flat key %q resolved empty", k)
+	}
+}
+
 // TestBundleTranslator_PluralSelection proves count==1 selects the
 // "one" form and other counts select "other".
 func TestBundleTranslator_PluralSelection(t *testing.T) {

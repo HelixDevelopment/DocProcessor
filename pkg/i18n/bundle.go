@@ -77,20 +77,26 @@ func NewBundleTranslator(defaultLocale string) (*BundleTranslator, error) {
 	if err != nil {
 		return nil, fmt.Errorf("i18n: read bundles dir: %w", err)
 	}
+	// Two bundle surfaces share this directory and BOTH are loaded into
+	// the same per-locale message map so a single Translator resolves
+	// every user-facing ID regardless of which surface declares it:
+	//
+	//  1. NESTED `<locale>.yaml` (e.g. en.yaml, sr.yaml) — keys under
+	//     the `cli_*` namespace, each mapping to a {one, other} struct
+	//     for plural selection.
+	//  2. FLAT `active.<locale>.yaml` — keys under the
+	//     `docprocessor_cli_*` namespace, each mapping DIRECTLY to a
+	//     plain string. This is the surface the docprocessor CLI
+	//     (cmd/docprocessor) emits; loading it here is what lets
+	//     newTranslator return a REAL Translator instead of NoopTranslator.
+	//
+	// Pass 1 ingests the nested files; pass 2 merges the flat files into
+	// the same locale maps (flat string -> message{Other: <string>}).
+	// A flat key never collides with a nested key (distinct namespaces),
+	// so the merge is additive.
 	for _, e := range entries {
 		name := e.Name()
-		if !strings.HasSuffix(name, ".yaml") {
-			continue
-		}
-		// The `active.<locale>.yaml` files are a SEPARATE flat-schema
-		// surface (keys prefixed `docprocessor_cli_`, mapped directly
-		// to plain strings) consumed by cmd/docprocessor via a direct
-		// path read — NOT through this nested-schema BundleTranslator.
-		// The embed glob `bundles/*.yaml` would otherwise sweep them in
-		// and fail YAML unmarshalling into the {one/other} message
-		// struct. A BundleTranslator locale bundle is `<locale>.yaml`
-		// (e.g. en.yaml, sr.yaml); skip the `active.` prefixed files.
-		if strings.HasPrefix(name, "active.") {
+		if !strings.HasSuffix(name, ".yaml") || strings.HasPrefix(name, "active.") {
 			continue
 		}
 		raw, err := bundleFS.ReadFile("bundles/" + name)
@@ -103,6 +109,33 @@ func NewBundleTranslator(defaultLocale string) (*BundleTranslator, error) {
 		}
 		locale := strings.TrimSuffix(name, ".yaml")
 		bt.locales[locale] = msgs
+	}
+	for _, e := range entries {
+		name := e.Name()
+		if !strings.HasSuffix(name, ".yaml") || !strings.HasPrefix(name, "active.") {
+			continue
+		}
+		raw, err := bundleFS.ReadFile("bundles/" + name)
+		if err != nil {
+			return nil, fmt.Errorf("i18n: read flat bundle %s: %w", name, err)
+		}
+		var flat map[string]string
+		if err := yaml.Unmarshal(raw, &flat); err != nil {
+			return nil, fmt.Errorf("i18n: parse flat bundle %s: %w", name, err)
+		}
+		// "active.en.yaml" -> locale "en".
+		locale := strings.TrimSuffix(strings.TrimPrefix(name, "active."), ".yaml")
+		msgs, ok := bt.locales[locale]
+		if !ok {
+			msgs = make(map[string]message, len(flat))
+			bt.locales[locale] = msgs
+		}
+		for id, text := range flat {
+			// Distinct namespace (docprocessor_cli_* vs cli_*) means a
+			// flat key never shadows a nested key. A flat string has no
+			// plural distinction, so it is the Other (generic) form.
+			msgs[id] = message{Other: text}
+		}
 	}
 	if _, ok := bt.locales[defaultLocale]; !ok {
 		return nil, fmt.Errorf("i18n: default locale %q has no bundle", defaultLocale)

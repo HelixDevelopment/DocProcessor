@@ -299,17 +299,20 @@ func TestRunCLI_BundleContainsAllRound209MsgIDs(t *testing.T) {
 	}
 }
 
-// TestNewTranslator_ProductionWiringRendersVisibleOutput is the §1.1
+// TestNewTranslator_ProductionWiringRendersRealStrings is the §1.1
 // paired-mutation guard for main()'s production translator wiring. It
 // drives runCLI through the REAL translator returned by newTranslator()
 // (the same object main() hands runCLI) and asserts the usage branch
-// produces non-empty, ID-bearing stderr. The forbidden mutation this
-// catches: replacing newTranslator()'s return with a translator whose
-// T/TPlural return "" (an empty-string substitution would let every
-// runCLI line silently vanish — a §11.4 PASS-bluff at the i18n layer).
-// If newTranslator() is mutated to emit empty strings, the
-// non-empty + sentinel assertions below FAIL.
-func TestNewTranslator_ProductionWiringRendersVisibleOutput(t *testing.T) {
+// produces the genuine localised strings — NOT the raw message IDs.
+//
+// RECONCILED per §11.4.120: newTranslator() was wired from
+// NoopTranslator (id-echo) to the flat-bundle BundleTranslator, so the
+// invariant flipped from "raw IDs visible" to "real text rendered".
+// The forbidden mutation this now catches: reverting newTranslator()
+// to NoopTranslator (or any translator that fails to resolve the flat
+// docprocessor_cli_* bundle) re-introduces id-echo and FAILs both the
+// resolved-string assertions AND the raw-ID-leak assertions below.
+func TestNewTranslator_ProductionWiringRendersRealStrings(t *testing.T) {
 	tr := newTranslator()
 	if tr == nil {
 		t.Fatal("newTranslator() returned nil — main() would panic dispatching runCLI")
@@ -320,14 +323,25 @@ func TestNewTranslator_ProductionWiringRendersVisibleOutput(t *testing.T) {
 	if rc != 1 {
 		t.Fatalf("runCLI(no-args) exit code = %d, want 1", rc)
 	}
-	if strings.TrimSpace(stderr.String()) == "" {
+	got := stderr.String()
+	if strings.TrimSpace(got) == "" {
 		t.Fatalf("production translator produced empty stderr — i18n wiring is a no-op bluff")
 	}
-	// The production NoopTranslator echoes IDs verbatim as positive
-	// evidence per pkg/i18n's Article XI §11.9 contract.
+	// The production BundleTranslator resolves the flat docprocessor_cli_*
+	// bundle to real localised strings (NOT id-echo).
+	for _, want := range []string{
+		"Usage: docprocessor [--verbose] <docs-directory>",
+		"DocProcessor extracts a structured feature map from a directory of project documentation.",
+	} {
+		if !strings.Contains(got, want) {
+			t.Fatalf("production stderr missing resolved string %q; got %q", want, got)
+		}
+	}
+	// And the raw IDs MUST NOT leak — their presence means id-echo (the
+	// pre-wiring NoopTranslator bluff) regressed.
 	for _, id := range []string{"docprocessor_cli_usage", "docprocessor_cli_help_header"} {
-		if !strings.Contains(stderr.String(), id) {
-			t.Fatalf("production stderr missing rendered msg ID %q; got %q", id, stderr.String())
+		if strings.Contains(got, id) {
+			t.Fatalf("production stderr leaked raw msg ID %q (id-echo regression — flat bundle not resolved); got %q", id, got)
 		}
 	}
 }

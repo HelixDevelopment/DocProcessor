@@ -31,21 +31,25 @@ func main() {
 //
 // The CLI message IDs runCLI emits use the `docprocessor_cli_*`
 // namespace and live in the FLAT-schema bundle pkg/i18n/bundles/
-// active.en.yaml. The nested-schema i18n.BundleTranslator deliberately
-// SKIPS `active.*` files (see pkg/i18n/bundle.go) and keys its bundles
-// under the legacy `cli_*` namespace — so a BundleTranslator could NOT
-// resolve any string runCLI prints and would loud-echo every ID while
-// appearing to localise. Per the no-guessing / no-bluff discipline
-// (Article XI §11.9), wiring it here would be a misleading no-op.
+// active.<locale>.yaml. As of the pkg/i18n flat-bundle support
+// (NewBundleTranslator now loads the `active.*` surface in a second
+// pass — see pkg/i18n/bundle.go), the BundleTranslator resolves every
+// `docprocessor_cli_*` ID to its real localised string, so the
+// production CLI renders genuine text rather than id-echo. The bundles
+// are embedded via `//go:embed bundles/*.yaml`, so resolution is
+// CWD-independent in the installed binary.
 //
-// NoopTranslator is therefore the honest production default: it echoes
-// each message ID verbatim, which the i18n package documents as
-// positive evidence (operators see exactly which key was rendered) and
-// keeps the binary functional. Localised rendering of the flat
-// `docprocessor_cli_*` bundle is a pkg/i18n concern (a flat-bundle
-// Translator) tracked outside this CLI entry point.
+// If bundle construction fails for any reason, fall back to
+// NoopTranslator (id-echo) so the binary stays functional and never
+// panics — the honest degraded mode. This is NEVER a silent
+// empty-string substitution (which would be a §11.4 PASS-bluff at the
+// i18n layer); the id-echo fallback keeps every line visible.
 func newTranslator() i18n.Translator {
-	return i18n.NoopTranslator{}
+	tr, err := i18n.NewBundleTranslator("en")
+	if err != nil {
+		return i18n.NoopTranslator{}
+	}
+	return tr
 }
 
 // runCLI is the real CLI body. It returns the process exit code so the
