@@ -82,6 +82,17 @@ func NewBundleTranslator(defaultLocale string) (*BundleTranslator, error) {
 		if !strings.HasSuffix(name, ".yaml") {
 			continue
 		}
+		// The `active.<locale>.yaml` files are a SEPARATE flat-schema
+		// surface (keys prefixed `docprocessor_cli_`, mapped directly
+		// to plain strings) consumed by cmd/docprocessor via a direct
+		// path read — NOT through this nested-schema BundleTranslator.
+		// The embed glob `bundles/*.yaml` would otherwise sweep them in
+		// and fail YAML unmarshalling into the {one/other} message
+		// struct. A BundleTranslator locale bundle is `<locale>.yaml`
+		// (e.g. en.yaml, sr.yaml); skip the `active.` prefixed files.
+		if strings.HasPrefix(name, "active.") {
+			continue
+		}
 		raw, err := bundleFS.ReadFile("bundles/" + name)
 		if err != nil {
 			return nil, fmt.Errorf("i18n: read bundle %s: %w", name, err)
