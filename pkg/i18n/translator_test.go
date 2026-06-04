@@ -75,9 +75,15 @@ func TestBundleTranslator_ResolvesFlatCLIBundle(t *testing.T) {
 	})
 	require.Equal(t, "Feature map: 5 features, 2 screens, 1 workflows", got)
 
-	// A flat-namespace key the CLI uses but with NO locale-specific
-	// override still resolves via the default-locale (en) bundle.
-	got = tr.T(WithLocale(ctx, "sr"), "docprocessor_cli_done",
+	// A flat-namespace key the CLI uses under an UNKNOWN locale (no
+	// bundle, no base-language match) still resolves via the
+	// default-locale (en) bundle. (W7C reconciliation per §11.4.120: the
+	// original assertion used "sr" to prove default-fallback, valid only
+	// while active.sr.yaml was absent. Now that the Serbian flat bundle
+	// exists — by design, the W7C deliverable — "sr" correctly returns
+	// Serbian, so the default-fallback contract is re-asserted here with
+	// a genuinely-unknown locale "xx", preserving the original intent.)
+	got = tr.T(WithLocale(ctx, "xx"), "docprocessor_cli_done",
 		map[string]any{"elapsed_ms": 12})
 	require.Equal(t, "Done in 12 ms.", got,
 		"unknown-locale flat key must fall back to default, not echo")
@@ -115,6 +121,105 @@ func TestBundleTranslator_AllFlatCLIKeysResolve(t *testing.T) {
 		got := tr.T(ctx, k, nil)
 		require.NotEqual(t, k, got, "flat key %q must resolve (not echo)", k)
 		require.NotEmpty(t, strings.TrimSpace(got), "flat key %q resolved empty", k)
+	}
+}
+
+// TestBundleTranslator_FlatCLIBundleSerbian is the W7C RED→GREEN proof
+// that Serbian CLI users get Serbian text for the FLAT
+// `docprocessor_cli_*` namespace (the surface cmd/docprocessor emits),
+// not the English fallback. Before `active.sr.yaml` exists, the "sr"
+// locale has no flat entry for these IDs, so lookup falls back to the
+// default (en) bundle and returns the English sentence — this test
+// FAILS on that pre-fix state. Once `active.sr.yaml` is merged into the
+// "sr" locale map (pass 2 of NewBundleTranslator), the same lookup
+// returns the Serbian string and placeholder interpolation works.
+//
+// RED proof (pre-fix, no active.sr.yaml): docprocessor_cli_usage under
+// "sr" returns "Usage: docprocessor [--verbose] <docs-directory>"
+// (English fallback) — the require.Equal on the Serbian string FAILs.
+func TestBundleTranslator_FlatCLIBundleSerbian(t *testing.T) {
+	tr, err := NewBundleTranslator("en")
+	require.NoError(t, err)
+	srCtx := WithLocale(context.Background(), "sr")
+
+	// A flat CLI key resolves to its Serbian string, NOT the English
+	// fallback. This is the load-bearing anti-bluff assertion: if the
+	// "sr" flat bundle is missing, lookup falls back to en and this FAILs.
+	got := tr.T(srCtx, "docprocessor_cli_usage", nil)
+	require.Equal(t,
+		"Upotreba: docprocessor [--verbose] <direktorijum-dokumentacije>",
+		got)
+	require.NotEqual(t,
+		"Usage: docprocessor [--verbose] <docs-directory>", got,
+		"sr flat CLI key must not fall back to the English string")
+
+	// Placeholder interpolation works for the Serbian flat string and
+	// the {{.error}} token is preserved (interpolated, not translated).
+	got = tr.T(srCtx, "docprocessor_cli_error_loading_docs",
+		map[string]any{"error": "boom"})
+	require.Equal(t, "Greška pri učitavanju dokumentacije: boom", got)
+	require.Contains(t, got, "boom", "placeholder value must interpolate")
+
+	// Multi-placeholder Serbian flat string interpolates all tokens.
+	got = tr.T(srCtx, "docprocessor_cli_feature_map_summary", map[string]any{
+		"features": 5, "screens": 2, "workflows": 1,
+	})
+	require.Equal(t,
+		"Mapa funkcionalnosti: 5 funkcionalnosti, 2 ekrana, 1 tokova", got)
+
+	// Base-language fallback: "sr-RS" resolves to the "sr" flat bundle.
+	srRS := tr.T(WithLocale(context.Background(), "sr-RS"),
+		"docprocessor_cli_usage", nil)
+	require.Equal(t, got2SerbianUsage(), srRS,
+		"sr-RS must resolve to the sr flat bundle")
+}
+
+// got2SerbianUsage centralises the expected Serbian usage string so the
+// base-language-fallback assertion cannot drift from the primary one.
+func got2SerbianUsage() string {
+	return "Upotreba: docprocessor [--verbose] <direktorijum-dokumentacije>"
+}
+
+// TestBundleTranslator_AllFlatCLIKeysResolveSerbian is the completeness
+// gate for the Serbian flat surface: every `docprocessor_cli_*` ID MUST
+// resolve under "sr" to a NON-English, non-empty string (i.e. it came
+// from active.sr.yaml, not the en fallback). A drift where a key is
+// missing from active.sr.yaml silently falls back to English and is
+// caught here.
+func TestBundleTranslator_AllFlatCLIKeysResolveSerbian(t *testing.T) {
+	enTr, err := NewBundleTranslator("en")
+	require.NoError(t, err)
+	enCtx := context.Background()
+	srCtx := WithLocale(context.Background(), "sr")
+
+	flatKeys := []string{
+		"docprocessor_cli_usage",
+		"docprocessor_cli_error_loading_docs",
+		"docprocessor_cli_loaded_documents",
+		"docprocessor_cli_error_building_feature_map",
+		"docprocessor_cli_feature_map_summary",
+		"docprocessor_cli_doc_graph_summary",
+		"docprocessor_cli_category_line",
+		"docprocessor_cli_platform_line",
+		"docprocessor_cli_help_header",
+		"docprocessor_cli_path_invalid",
+		"docprocessor_cli_error_resolving_path",
+		"docprocessor_cli_no_docs_found",
+		"docprocessor_cli_format_summary",
+		"docprocessor_cli_summary_header",
+		"docprocessor_cli_feature_line",
+		"docprocessor_cli_screen_line",
+		"docprocessor_cli_workflow_line",
+		"docprocessor_cli_done",
+	}
+	for _, k := range flatKeys {
+		sr := enTr.T(srCtx, k, nil)
+		en := enTr.T(enCtx, k, nil)
+		require.NotEqual(t, k, sr, "sr flat key %q must resolve (not echo)", k)
+		require.NotEmpty(t, strings.TrimSpace(sr),
+			"sr flat key %q resolved empty", k)
+		require.NotEqual(t, en, sr,
+			"sr flat key %q must differ from English (no fallback)", k)
 	}
 }
 

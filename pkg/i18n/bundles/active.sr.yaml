@@ -1,0 +1,48 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright 2026 Milos Vasic
+#
+# DocProcessor CLI active Serbian (Latin script) bundle (CONST-046).
+# Serbian translations of the 19 `docprocessor_cli_*` message IDs the
+# docprocessor CLI (cmd/docprocessor) emits. This FLAT surface mirrors
+# active.en.yaml key-for-key; the BundleTranslator second pass merges it
+# into the "sr" locale map so Serbian operators get Serbian CLI output
+# instead of falling back to English.
+#
+# Script: Serbian Latin (latinica), matching the operator's locale.
+#
+# Placeholder discipline (§11.4.6 / W7C task): every `{{.token}}` is
+# preserved EXACTLY — placeholder NAMES are interpolation keys, never
+# translated. Only the surrounding human-readable text is localised.
+#
+# Technical-term notes (§11.4.6 no-guessing): where a term has an
+# established, natural Serbian equivalent it is used. Domain terms with
+# a clean Serbian rendering:
+#   - "feature"  -> "funkcionalnost"
+#   - "screen"   -> "ekran"
+#   - "workflow" -> "tok" (radni tok); short form "tok" matches the
+#     existing nested sr.yaml cli_feature_map_summary translation.
+#   - "node"/"edge" (graph) -> "čvor"/"grana"
+#   - "category"/"platform" -> "kategorija"/"platforma"
+#   - "directory" -> "direktorijum"
+#   - "documentation"/"document" -> "dokumentacija"/"dokument"
+# No term required an English fallback; no UNCONFIRMED lines.
+
+docprocessor_cli_usage: "Upotreba: docprocessor [--verbose] <direktorijum-dokumentacije>"
+docprocessor_cli_error_loading_docs: "Greška pri učitavanju dokumentacije: {{.error}}"
+docprocessor_cli_loaded_documents: "Učitano dokumenata: {{.count}}"
+docprocessor_cli_error_building_feature_map: "Greška pri izgradnji mape funkcionalnosti: {{.error}}"
+docprocessor_cli_feature_map_summary: "Mapa funkcionalnosti: {{.features}} funkcionalnosti, {{.screens}} ekrana, {{.workflows}} tokova"
+docprocessor_cli_doc_graph_summary: "Graf dokumentacije: {{.nodes}} čvorova, {{.edges}} grana"
+docprocessor_cli_category_line: "  Kategorija {{.category}}: {{.count}} funkcionalnosti"
+docprocessor_cli_platform_line: "  Platforma {{.platform}}: {{.count}} funkcionalnosti"
+
+docprocessor_cli_help_header: "DocProcessor izdvaja strukturisanu mapu funkcionalnosti iz direktorijuma sa projektnom dokumentacijom."
+docprocessor_cli_path_invalid: "Neispravan argument direktorijuma-dokumentacije: {{.path}}"
+docprocessor_cli_error_resolving_path: "Greška pri razrešavanju putanje {{.path}}: {{.error}}"
+docprocessor_cli_no_docs_found: "Nije pronađen nijedan podržani dokument u {{.path}} — nema šta da se obradi."
+docprocessor_cli_format_summary: "Pretraga formata: {{.formats}}"
+docprocessor_cli_summary_header: "=== Sažetak mape funkcionalnosti ==="
+docprocessor_cli_feature_line: "  Funkcionalnost [{{.id}}] {{.name}} (kategorija: {{.category}})"
+docprocessor_cli_screen_line: "  Ekran   [{{.id}}] {{.name}}"
+docprocessor_cli_workflow_line: "  Tok     [{{.id}}] {{.name}} ({{.steps}} koraka)"
+docprocessor_cli_done: "Završeno za {{.elapsed_ms}} ms."
