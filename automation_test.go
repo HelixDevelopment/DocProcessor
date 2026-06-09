@@ -137,8 +137,10 @@ func TestAutomation_EnvExampleExists(t *testing.T) {
 }
 
 func TestAutomation_UpstreamsExist(t *testing.T) {
-	entries, err := os.ReadDir("Upstreams")
-	require.NoError(t, err, "Upstreams directory should exist")
+	// CONST-052: the canonical directory name is lowercase snake_case "upstreams"
+	// (HXC-049: the test previously read capital "Upstreams" → deterministic FAIL).
+	entries, err := os.ReadDir("upstreams")
+	require.NoError(t, err, "upstreams directory should exist")
 
 	hasScript := false
 	for _, e := range entries {
@@ -147,7 +149,7 @@ func TestAutomation_UpstreamsExist(t *testing.T) {
 			break
 		}
 	}
-	assert.True(t, hasScript, "Upstreams should contain shell scripts")
+	assert.True(t, hasScript, "upstreams should contain shell scripts")
 }
 
 func TestAutomation_AllSourceFilesHaveLicense(t *testing.T) {
