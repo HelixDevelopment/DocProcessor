@@ -6,7 +6,9 @@ package feature
 import (
 	"context"
 	"fmt"
+	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"digital.vasic.docprocessor/pkg/llm"
 	"digital.vasic.docprocessor/pkg/loader"
@@ -267,4 +269,59 @@ func TestTruncate(t *testing.T) {
 	assert.Equal(t, "hello", truncate("hello", 10))
 	assert.Equal(t, "hell...", truncate("hello world", 4))
 	assert.Equal(t, "", truncate("", 10))
+}
+
+// TestTruncate_DoesNotCorruptMultibyteRunes is a reproduce-first RED test for
+// the byte-vs-rune truncation bug. truncate() slices by BYTE offset (s[:maxLen]);
+// for non-ASCII text (Cyrillic, every char = 2 UTF-8 bytes) a byte-offset cut can
+// fall in the middle of a multibyte rune, producing invalid UTF-8 in the
+// Feature.Description that BuildFromDocs ships to downstream consumers / serializers.
+//
+// Cyrillic "Подршка за превод" repeated: each Cyrillic letter is 2 bytes, so an
+// odd byte-offset cut splits a rune. With maxLen=5 over a Cyrillic string the byte
+// slice s[:5] ends mid-rune.
+func TestTruncate_DoesNotCorruptMultibyteRunes(t *testing.T) {
+	// "Подршка" — 7 Cyrillic letters = 14 bytes. maxLen=5 (bytes) lands mid-rune.
+	cyrillic := "Подршка"
+	require.False(t, utf8.ValidString(cyrillic[:5]),
+		"precondition: a raw byte-slice at offset 5 of this Cyrillic string IS invalid UTF-8")
+
+	out := truncate(cyrillic, 5)
+
+	// The truncated output (minus the "..." ellipsis) must remain valid UTF-8 —
+	// truncation must never split a rune and corrupt the text.
+	assert.True(t, utf8.ValidString(out),
+		"truncate corrupted multibyte text: produced invalid UTF-8 %q", out)
+	body := strings.TrimSuffix(out, "...")
+	assert.True(t, utf8.ValidString(body),
+		"truncate body is invalid UTF-8 (mid-rune cut): %q", body)
+}
+
+// TestBuildFromDocs_CyrillicDescriptionStaysValidUTF8 proves the corruption is
+// user-visible end-to-end: a long Cyrillic section description (>500 bytes) gets
+// truncated by BuildFromDocs and the resulting Feature.Description must be valid
+// UTF-8, not a string ending in a broken half-rune.
+func TestBuildFromDocs_CyrillicDescriptionStaysValidUTF8(t *testing.T) {
+	// Build a Cyrillic description longer than the 500-byte truncate threshold.
+	// "Подршка за превод докумената. " is 30 runes / 53 bytes; repeat to exceed 500 bytes.
+	unit := "Подршка за превод докумената на ћирилицу. "
+	long := strings.Repeat(unit, 20) // well over 500 bytes
+	require.Greater(t, len(long), 500)
+
+	doc := loader.Document{
+		Path:  "/docs/feature.md",
+		Title: "Документ",
+		Sections: []loader.Section{
+			{Title: "Превод", Level: 2, Content: long, Line: 1},
+		},
+	}
+
+	b := NewBuilder("/project")
+	fm, err := b.BuildFromDocs(context.Background(), []loader.Document{doc})
+	require.NoError(t, err)
+	require.Len(t, fm.Features, 1)
+
+	desc := fm.Features[0].Description
+	assert.True(t, utf8.ValidString(desc),
+		"BuildFromDocs shipped a Feature.Description with corrupted (invalid) UTF-8: %q", desc)
 }
