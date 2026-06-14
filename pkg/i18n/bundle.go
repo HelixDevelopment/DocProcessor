@@ -170,15 +170,37 @@ func (bt *BundleTranslator) lookup(locale, id string) (message, bool) {
 }
 
 // interpolate substitutes {{.key}} placeholders using args.
+//
+// It performs a SINGLE left-to-right scan of the ORIGINAL template so
+// that each placeholder present in the template is replaced exactly
+// once. Placeholder-looking text that appears INSIDE a substituted
+// value (e.g. an arg value that is a path containing "{{.name}}") is
+// never re-expanded — the previous per-key strings.ReplaceAll loop
+// re-scanned already-substituted output and produced order-dependent
+// (Go map-iteration nondeterministic) corruption of the rendered
+// message. The bundle contract requires every {{.token}} be preserved
+// exactly; a token that originated from a value is literal text.
 func interpolate(tmpl string, args map[string]any) string {
 	if len(args) == 0 || !strings.Contains(tmpl, "{{") {
 		return tmpl
 	}
-	out := tmpl
-	for k, v := range args {
-		out = strings.ReplaceAll(out, "{{."+k+"}}", fmt.Sprint(v))
+	var out strings.Builder
+	out.Grow(len(tmpl))
+	for i := 0; i < len(tmpl); {
+		if strings.HasPrefix(tmpl[i:], "{{.") {
+			if end := strings.Index(tmpl[i:], "}}"); end >= 0 {
+				key := tmpl[i+3 : i+end]
+				if v, ok := args[key]; ok {
+					out.WriteString(fmt.Sprint(v))
+					i += end + 2
+					continue
+				}
+			}
+		}
+		out.WriteByte(tmpl[i])
+		i++
 	}
-	return out
+	return out.String()
 }
 
 // T resolves messageID for the locale carried by ctx (or the default
