@@ -1,19 +1,11 @@
 #!/usr/bin/env bash
 # ddos_health_flood_challenge.sh — anti-bluff DDoS Challenge for
 # DocProcessor per CONST-035 + CONST-050(B). Submodule cascade per
-<<<<<<< HEAD
 # CONST-051(A). Targets $DOCPROCESSOR_HEALTH_URL.
 
 set -uo pipefail
 
 HEALTH_URL="${DOCPROCESSOR_HEALTH_URL:-}"
-=======
-# CONST-051(A). Targets $DOCPROCESSOR_VD_HEALTH_URL.
-
-set -uo pipefail
-
-HEALTH_URL="${DOCPROCESSOR_VD_HEALTH_URL:-}"
->>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
 TOTAL_REQS="${DDOS_REQUESTS:-500}"
 CONCURRENCY="${DDOS_CONCURRENCY:-50}"
 TIMEOUT_SEC="${DDOS_TIMEOUT_SEC:-5}"
@@ -23,11 +15,7 @@ echo "=== DocProcessor DDoS Health-Flood Challenge ==="
 echo "  url=$HEALTH_URL total=$TOTAL_REQS conc=$CONCURRENCY pass≥${MIN_PASS_PCT}%"
 
 if [[ -z "$HEALTH_URL" ]]; then
-<<<<<<< HEAD
     echo "[1/5] SKIP: DOCPROCESSOR_HEALTH_URL unset — SKIP-OK: #env-no-target"
-=======
-    echo "[1/5] SKIP: DOCPROCESSOR_VD_HEALTH_URL unset — SKIP-OK: #env-no-target"
->>>>>>> 9f5637d2d695cd5fcf8349d1f1b8bf780fa5d865
     echo "=== DocProcessor DDoS Challenge: PASSED (SKIP-OK) ==="
     exit 0
 fi
