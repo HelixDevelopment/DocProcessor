@@ -19,11 +19,11 @@ import (
 
 // mockLLMAgent is a mock implementation of llm.LLMAgent for testing.
 type mockLLMAgent struct {
-	summarizeFunc      func(ctx context.Context, text string) (string, error)
-	extractFunc        func(ctx context.Context, text string) ([]llm.RawFeature, error)
-	classifyFunc       func(ctx context.Context, feature llm.RawFeature) (llm.FeatureCategory, error)
-	inferScreensFunc   func(ctx context.Context, features []llm.Feature) ([]llm.ExpectedScreen, error)
-	generateStepsFunc  func(ctx context.Context, feature llm.Feature) ([]llm.TestStep, error)
+	summarizeFunc     func(ctx context.Context, text string) (string, error)
+	extractFunc       func(ctx context.Context, text string) ([]llm.RawFeature, error)
+	classifyFunc      func(ctx context.Context, feature llm.RawFeature) (llm.FeatureCategory, error)
+	inferScreensFunc  func(ctx context.Context, features []llm.Feature) ([]llm.ExpectedScreen, error)
+	generateStepsFunc func(ctx context.Context, feature llm.Feature) ([]llm.TestStep, error)
 }
 
 func (m *mockLLMAgent) Summarize(ctx context.Context, text string) (string, error) {
@@ -76,9 +76,9 @@ func TestBuilder_BuildFromDocs_Markdown(t *testing.T) {
 	builder := NewBuilder("/project")
 	docs := []loader.Document{
 		{
-			Path:   "/project/docs/features.md",
-			Format: "md",
-			Title:  "Features",
+			Path:    "/project/docs/features.md",
+			Format:  "md",
+			Title:   "Features",
 			Content: "# Features\n\n## Markdown Editing\n\nEdit markdown files with syntax highlighting and live preview.",
 			Sections: []loader.Section{
 				{Title: "Features", Level: 1, Content: "Overview content"},
@@ -130,9 +130,9 @@ func TestBuilder_Enrich(t *testing.T) {
 	builder := NewBuilder("/project")
 	fm := NewFeatureMap("/project")
 	fm.AddFeature(Feature{
-		ID:       "feat-test",
-		Name:     "Test Feature",
-		Category: CategoryUI,
+		ID:        "feat-test",
+		Name:      "Test Feature",
+		Category:  CategoryUI,
 		Platforms: []string{"android"},
 	})
 

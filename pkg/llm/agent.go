@@ -12,11 +12,11 @@ import (
 
 // RawFeature is an unprocessed feature extracted by the LLM.
 type RawFeature struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	Category    string `json:"category"`
+	Name        string   `json:"name"`
+	Description string   `json:"description"`
+	Category    string   `json:"category"`
 	Platforms   []string `json:"platforms"`
-	Priority    string `json:"priority"`
+	Priority    string   `json:"priority"`
 }
 
 // FeatureCategory is re-declared here as a string to avoid circular imports.

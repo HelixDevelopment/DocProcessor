@@ -222,8 +222,8 @@ func TestE2E_CoverageByPlatformAndCategory(t *testing.T) {
 
 	// Register features across categories and platforms
 	features := []struct {
-		id       string
-		category string
+		id        string
+		category  string
 		platforms []string
 	}{
 		{"feat-md", "format", []string{"android", "desktop", "web"}},
@@ -263,8 +263,8 @@ func TestE2E_FeatureMapMerge(t *testing.T) {
 	// Build two feature maps from different doc sets
 	fm1, err := builder.BuildFromDocs(context.Background(), []loader.Document{
 		{
-			Path:   "/project/README.md",
-			Title:  "README",
+			Path:  "/project/README.md",
+			Title: "README",
 			Sections: []loader.Section{
 				{Title: "Feature A", Content: "Feature A description with enough text to pass heuristic."},
 			},
@@ -274,8 +274,8 @@ func TestE2E_FeatureMapMerge(t *testing.T) {
 
 	fm2, err := builder.BuildFromDocs(context.Background(), []loader.Document{
 		{
-			Path:   "/project/GUIDE.md",
-			Title:  "Guide",
+			Path:  "/project/GUIDE.md",
+			Title: "Guide",
 			Sections: []loader.Section{
 				{Title: "Feature B", Content: "Feature B description with enough text to pass heuristic."},
 			},
