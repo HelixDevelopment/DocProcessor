@@ -39,7 +39,7 @@ Canonical reference: <https://github.com/HelixDevelopment/HelixConstitution>
 **Version**: 3.0.0 (Updated with full architecture audit)
 **Date**: 2026-04-30
 **Scope**: All AI agents, human contributors, and automated processes working on HelixCode
-**Authority**: Derived from HelixAgent AGENTS.md with HelixCode-specific enhancements
+**Authority**: Derived from the parent project's AGENTS.md with project-specific enhancements
 
 ---
 
@@ -765,7 +765,7 @@ A change is NOT done because code compiles. "Done" requires:
 
 A test or Challenge that PASSES is a CLAIM that the tested behavior **works for the end user of the product**.
 
-The HelixAgent project has repeatedly hit the failure mode where every test ran green AND every Challenge reported PASS, yet most product features did not actually work — buggy challenge wrappers masked failed assertions, scripts checked file existence without executing the file, "reachability" tests tolerated timeouts, contracts were honest in advertising but broken in dispatch. **This MUST NOT recur in HelixCode.**
+The parent project has repeatedly hit the failure mode where every test ran green AND every Challenge reported PASS, yet most product features did not actually work — buggy challenge wrappers masked failed assertions, scripts checked file existence without executing the file, "reachability" tests tolerated timeouts, contracts were honest in advertising but broken in dispatch. **This MUST NOT recur in HelixCode.**
 
 Every PASS result MUST guarantee:
 a. **Quality** — correct behavior under real inputs, edge cases, concurrency
@@ -1119,7 +1119,7 @@ Non-compliance is a release blocker regardless of context.
 `user@1000.service` was again SIGKILLed (`status=9/KILL`), this time
 WITHOUT a kernel OOM kill (systemd-oomd inactive, `MemoryMax=infinity`)
 — a different vector than Incident #1. Cascade killed `claude`,
-`tmux`, the in-flight ATMOSphere build, and 20+ npm MCP server
+`tmux`, the in-flight parent-project build, and 20+ npm MCP server
 processes. Likely cumulative cgroup pressure + external watchdog.
 
 **Mandatory safeguards effective 2026-04-28** (full text in parent
@@ -1136,13 +1136,13 @@ processes. Likely cumulative cgroup pressure + external watchdog.
    per-user-slice — operator MUST cap Σ `mem_limit` ≤ physical RAM
    − user-session overhead.
 4. 20+ npm-spawned MCP server processes are a known memory multiplier;
-   stop non-essential MCPs before heavy ATMOSphere work.
+   stop non-essential MCPs before heavy parent-project work.
 5. **Investigation: Docker/Podman as session-loss vector.** Per-container
    cgroups don't prevent cumulative user-slice pressure; conmon
    `Failed to open cgroups file: /sys/fs/cgroup/memory.events`
    warnings preceded the 18:36:35 SIGKILL by 6 min — likely correlated.
 
-This directive applies to every owned ATMOSphere repo and every
+This directive applies to every owned project repo and every
 HelixQA dependency. Non-compliance is a Constitution §12 violation.
 
 
@@ -1629,7 +1629,7 @@ user had to manually end the session anyway, because nothing
 prevented overlapping heavy workloads from saturating the slice.
 CONST-036 closes that loophole at both the source-code layer and the
 operational layer. See
-`docs/issues/fixed/SESSION_LOSS_2026-04-28.md` in the HelixAgent
+`docs/issues/fixed/SESSION_LOSS_2026-04-28.md` in the parent
 project.
 
 **Forbidden direct invocations** (non-exhaustive):
@@ -1665,7 +1665,7 @@ project.
 ## CONST-035 — End-User Usability Mandate (2026-04-29 strengthening)
 
 A test or Challenge that PASSES is a CLAIM that the tested behavior
-**works for the end user of the product**. The HelixAgent project
+**works for the end user of the product**. The parent project
 has repeatedly hit the failure mode where every test ran green AND
 every Challenge reported PASS, yet most product features did not
 actually work — buggy challenge wrappers masked failed assertions,
@@ -1690,7 +1690,7 @@ A passing test that doesn't certify all three is a **bluff** and
 MUST be tightened, or marked `t.Skip("...SKIP-OK: #<ticket>")`
 so absence of coverage is loud rather than silent.
 
-### Bluff taxonomy (each pattern observed in HelixAgent and now forbidden)
+### Bluff taxonomy (each pattern observed in the parent project and now forbidden)
 
 - **Wrapper bluff** — assertions PASS but the wrapper's exit-code
   logic is buggy, marking the run FAILED (or the inverse: assertions
@@ -1841,7 +1841,7 @@ CONST-055 is the **enforcement engine** for every other §11.4.x and CONST-NNN r
 
 > Verbatim user mandate (2026-05-15): *"Every Submodule or Git repository we add or clone MUST BE upstreams installed using Upstreamable utility which MUST BE available through exported paths of the host system (in .bashrc or .zhrc) using install_upstreams command executed from the root of the cloned (added) repository - only if in it is Upstreams or upstreams directory present with bash script files (recipes) for all repository's upstreams!"*
 
-Every clone / add of a Git repository under HelixCode MUST be followed by `install_upstreams` invocation from the repository's root IF its tree contains `upstreams/` (or legacy `Upstreams/` per CONST-052 transition) populated with `*.sh` recipe files. The utility (installed on operator's `PATH` via `.bashrc`/`.zshrc`; implementation in the constitution submodule's `install_upstreams.sh` — already supports BOTH directory names since constitution commit `45d3678`) reads the recipe files, configures every declared upstream as a named git remote, and fans out `origin` push URLs.
+Every clone / add of a Git repository under the consuming project MUST be followed by `install_upstreams` invocation from the repository's root IF its tree contains `upstreams/` (or legacy `Upstreams/` per CONST-052 transition) populated with `*.sh` recipe files. The utility (installed on operator's `PATH` via `.bashrc`/`.zshrc`; implementation in the constitution submodule's `install_upstreams.sh` — already supports BOTH directory names since constitution commit `45d3678`) reads the recipe files, configures every declared upstream as a named git remote, and fans out `origin` push URLs.
 
 Skipping the invocation when `upstreams/` is present silently breaks §2.1 (multi-upstream push is the norm) — the next push lands on only one upstream. Gate `CM-INSTALL-UPSTREAMS-ON-CLONE` + paired mutation. Automation: the future `incorporate-submodule` per CONST-054 auto-invokes; manual invocation supported. Pre-commit check: `git remote -v | grep -c push` reports expected count.
 

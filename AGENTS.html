@@ -285,8 +285,8 @@ below extend them and MUST NOT weaken any inherited clause.</p>
 <p><strong>Version</strong>: 3.0.0 (Updated with full architecture
 audit) <strong>Date</strong>: 2026-04-30 <strong>Scope</strong>: All AI
 agents, human contributors, and automated processes working on HelixCode
-<strong>Authority</strong>: Derived from HelixAgent AGENTS.md with
-HelixCode-specific enhancements</p>
+<strong>Authority</strong>: Derived from the parent project's AGENTS.md with
+project-specific enhancements</p>
 <hr />
 <h2 id="project-overview">Project Overview</h2>
 <p>HelixCode is an enterprise-grade distributed AI development platform
@@ -1379,7 +1379,7 @@ fix)</li>
 Usability Mandate</h2>
 <p>A test or Challenge that PASSES is a CLAIM that the tested behavior
 <strong>works for the end user of the product</strong>.</p>
-<p>The HelixAgent project has repeatedly hit the failure mode where
+<p>The parent project has repeatedly hit the failure mode where
 every test ran green AND every Challenge reported PASS, yet most product
 features did not actually work — buggy challenge wrappers masked failed
 assertions, scripts checked file existence without executing the file,
@@ -1800,7 +1800,7 @@ the user's <code>user@1000.service</code> was again SIGKILLed
 (<code>status=9/KILL</code>), this time WITHOUT a kernel OOM kill
 (systemd-oomd inactive, <code>MemoryMax=infinity</code>) — a different
 vector than Incident #1. Cascade killed <code>claude</code>,
-<code>tmux</code>, the in-flight ATMOSphere build, and 20+ npm MCP
+<code>tmux</code>, the in-flight parent-project build, and 20+ npm MCP
 server processes. Likely cumulative cgroup pressure + external
 watchdog.</p>
 <p><strong>Mandatory safeguards effective 2026-04-28</strong> (full text
@@ -1819,7 +1819,7 @@ suspected §12 incident. <code>mem_limit</code> is per-container, not
 per-user-slice — operator MUST cap Σ <code>mem_limit</code> ≤ physical
 RAM − user-session overhead.</li>
 <li>20+ npm-spawned MCP server processes are a known memory multiplier;
-stop non-essential MCPs before heavy ATMOSphere work.</li>
+stop non-essential MCPs before heavy parent-project work.</li>
 <li><strong>Investigation: Docker/Podman as session-loss
 vector.</strong> Per-container cgroups don't prevent cumulative
 user-slice pressure; conmon
@@ -1827,7 +1827,7 @@ user-slice pressure; conmon
 warnings preceded the 18:36:35 SIGKILL by 6 min — likely
 correlated.</li>
 </ol>
-<p>This directive applies to every owned ATMOSphere repo and every
+<p>This directive applies to every owned project repo and every
 HelixQA dependency. Non-compliance is a Constitution §12 violation.</p>
 <h2
 id="mandatory-126-memory-budget-ceiling--60-maximum-user-mandate-2026-04-30">MANDATORY
@@ -2420,7 +2420,7 @@ had to manually end the session anyway, because nothing prevented
 overlapping heavy workloads from saturating the slice. CONST-036 closes
 that loophole at both the source-code layer and the operational layer.
 See <code>docs/issues/fixed/SESSION_LOSS_2026-04-28.md</code> in the
-HelixAgent project.</p>
+parent project.</p>
 <p><strong>Forbidden direct invocations</strong> (non-exhaustive):</p>
 <ul>
 <li><code>loginctl terminate-user|terminate-session|kill-user|kill-session</code></li>
@@ -2459,7 +2459,7 @@ Rootless podman containers die with the user manager.</li>
 id="const-035--end-user-usability-mandate-2026-04-29-strengthening">CONST-035
 — End-User Usability Mandate (2026-04-29 strengthening)</h2>
 <p>A test or Challenge that PASSES is a CLAIM that the tested behavior
-<strong>works for the end user of the product</strong>. The HelixAgent
+<strong>works for the end user of the product</strong>. The parent
 project has repeatedly hit the failure mode where every test ran green
 AND every Challenge reported PASS, yet most product features did not
 actually work — buggy challenge wrappers masked failed assertions,
@@ -2483,7 +2483,7 @@ which of N internal aliases the dispatcher actually accepts.</p>
 coverage is loud rather than silent.</p>
 <h3
 id="bluff-taxonomy-each-pattern-observed-in-helixagent-and-now-forbidden">Bluff
-taxonomy (each pattern observed in HelixAgent and now forbidden)</h3>
+taxonomy (each pattern observed in the parent project and now forbidden)</h3>
 <ul>
 <li><strong>Wrapper bluff</strong> — assertions PASS but the wrapper's
 exit-code logic is buggy, marking the run FAILED (or the inverse:
@@ -2910,7 +2910,7 @@ executed from the root of the cloned (added) repository - only if in it
 is Upstreams or upstreams directory present with bash script files
 (recipes) for all repository's upstreams!"</em></p>
 </blockquote>
-<p>Every clone / add of a Git repository under HelixCode MUST be
+<p>Every clone / add of a Git repository under the consuming project MUST be
 followed by <code>install_upstreams</code> invocation from the
 repository's root IF its tree contains <code>upstreams/</code> (or
 legacy <code>Upstreams/</code> per CONST-052 transition) populated with

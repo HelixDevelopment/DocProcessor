@@ -57,7 +57,7 @@ help:
 	@echo "  clean       - Remove build artifacts"
 	@echo "  help        - Show this help"
 
-# Definition of Done gates — portable drop-in from HelixAgent
+# Definition of Done gates — portable drop-in from the parent project
 .PHONY: no-silent-skips no-silent-skips-warn demo-all demo-all-warn demo-one ci-validate-all
 
 no-silent-skips:

@@ -1,6 +1,6 @@
 ## INHERITED FROM Helix Constitution
 
-This module is a submodule of an ATMOSphere-family project that
+This module is a submodule of the parent project that
 includes the Helix Constitution submodule at the parent's
 `constitution/` path. All rules in `constitution/CLAUDE.md` and the
 `constitution/Constitution.md` it references (universal anti-bluff
@@ -33,7 +33,7 @@ Rules below MUST NOT weaken any inherited clause.
 **Version**: 1.0.0
 **Date**: 2026-04-30
 **Scope**: This document guides AI agents working on the HelixCode codebase
-**Authority**: Cascaded from HelixAgent root `CLAUDE.md` with HelixCode-specific addenda
+**Authority**: Cascaded from the parent project root `CLAUDE.md` with project-specific addenda
 
 ---
 
@@ -940,7 +940,7 @@ Non-compliance is a release blocker regardless of context.
 `user@1000.service` was again SIGKILLed (`status=9/KILL`), this time
 WITHOUT a kernel OOM kill (systemd-oomd inactive, `MemoryMax=infinity`)
 — a different vector than Incident #1. Cascade killed `claude`,
-`tmux`, the in-flight ATMOSphere build, and 20+ npm MCP server
+`tmux`, the in-flight parent-project build, and 20+ npm MCP server
 processes. Likely cumulative cgroup pressure + external watchdog.
 
 **Mandatory safeguards effective 2026-04-28** (full text in parent
@@ -957,13 +957,13 @@ processes. Likely cumulative cgroup pressure + external watchdog.
    per-user-slice — operator MUST cap Σ `mem_limit` ≤ physical RAM
    − user-session overhead.
 4. 20+ npm-spawned MCP server processes are a known memory multiplier;
-   stop non-essential MCPs before heavy ATMOSphere work.
+   stop non-essential MCPs before heavy parent-project work.
 5. **Investigation: Docker/Podman as session-loss vector.** Per-container
    cgroups don't prevent cumulative user-slice pressure; conmon
    `Failed to open cgroups file: /sys/fs/cgroup/memory.events`
    warnings preceded the 18:36:35 SIGKILL by 6 min — likely correlated.
 
-This directive applies to every owned ATMOSphere repo and every
+This directive applies to every owned project repo and every
 HelixQA dependency. Non-compliance is a Constitution §12 violation.
 
 
@@ -1449,7 +1449,7 @@ saturating the slice. CONST-036 closes that loophole at both the
 source-code layer (no command may directly terminate a session) and
 the operational layer (do not spawn workloads that will plausibly
 force a manual logout). See
-`docs/issues/fixed/SESSION_LOSS_2026-04-28.md` in the HelixAgent
+`docs/issues/fixed/SESSION_LOSS_2026-04-28.md` in the parent
 project for the full forensic timeline.
 
 ### Forbidden direct invocations (non-exhaustive)
@@ -1496,7 +1496,7 @@ All three must PASS.
 ## CONST-035 — End-User Usability Mandate (2026-04-29 strengthening)
 
 A test or Challenge that PASSES is a CLAIM that the tested behavior
-**works for the end user of the product**. The HelixAgent project
+**works for the end user of the product**. The parent project
 has repeatedly hit the failure mode where every test ran green AND
 every Challenge reported PASS, yet most product features did not
 actually work — buggy challenge wrappers masked failed assertions,
@@ -1521,7 +1521,7 @@ A passing test that doesn't certify all three is a **bluff** and
 MUST be tightened, or marked `t.Skip("...SKIP-OK: #<ticket>")`
 so absence of coverage is loud rather than silent.
 
-### Bluff taxonomy (each pattern observed in HelixAgent and now forbidden)
+### Bluff taxonomy (each pattern observed in the parent project and now forbidden)
 
 - **Wrapper bluff** — assertions PASS but the wrapper's exit-code
   logic is buggy, marking the run FAILED (or the inverse: assertions
@@ -1675,7 +1675,7 @@ CONST-055 is the **enforcement engine** for every other §11.4.x and CONST-NNN r
 
 > Verbatim user mandate (2026-05-15): *"Every Submodule or Git repository we add or clone MUST BE upstreams installed using Upstreamable utility which MUST BE available through exported paths of the host system (in .bashrc or .zhrc) using install_upstreams command executed from the root of the cloned (added) repository - only if in it is Upstreams or upstreams directory present with bash script files (recipes) for all repository's upstreams!"*
 
-Every clone / add of a Git repository under HelixCode MUST be followed by `install_upstreams` invocation from the repository's root IF its tree contains `upstreams/` (or legacy `Upstreams/` per CONST-052 transition) populated with `*.sh` recipe files. The utility (installed on operator's `PATH` via `.bashrc`/`.zshrc`; implementation in the constitution submodule's `install_upstreams.sh` — already supports BOTH directory names since constitution commit `45d3678`) reads the recipe files, configures every declared upstream as a named git remote, and fans out `origin` push URLs.
+Every clone / add of a Git repository under the consuming project MUST be followed by `install_upstreams` invocation from the repository's root IF its tree contains `upstreams/` (or legacy `Upstreams/` per CONST-052 transition) populated with `*.sh` recipe files. The utility (installed on operator's `PATH` via `.bashrc`/`.zshrc`; implementation in the constitution submodule's `install_upstreams.sh` — already supports BOTH directory names since constitution commit `45d3678`) reads the recipe files, configures every declared upstream as a named git remote, and fans out `origin` push URLs.
 
 Skipping the invocation when `upstreams/` is present silently breaks §2.1 (multi-upstream push is the norm) — the next push lands on only one upstream. Gate `CM-INSTALL-UPSTREAMS-ON-CLONE` + paired mutation. Automation: the future `incorporate-submodule` per CONST-054 auto-invokes; manual invocation supported. Pre-commit check: `git remote -v | grep -c push` reports expected count.
 
