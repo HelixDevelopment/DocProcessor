@@ -129,6 +129,24 @@ func TestConcurrentExport(t *testing.T) {
 	}
 
 	wg.Wait()
+
+	// Observable post-join assertion: the 20 concurrent MarkVerified writes
+	// raced against 20 concurrent Export reads; no MarkVerified may be lost.
+	// The final snapshot must show all 20 features present and ALL 20 verified
+	// on "android" (no lost write, no torn state).
+	snapshot := tracker.Export()
+	assert.Len(t, snapshot.Features, 20, "all 20 registered features must be present in the final snapshot")
+	report := snapshot.Report
+	assert.Equal(t, 20, report.Total, "total feature×platform count must be 20")
+	assert.Equal(t, 20, report.Verified, "every concurrent MarkVerified must be persisted (no lost write)")
+	assert.Equal(t, 1.0, report.OverallPct, "all features verified ⇒ 100%% coverage")
+	for i := 0; i < 20; i++ {
+		fid := fmt.Sprintf("f%d", i)
+		platforms, ok := snapshot.Features[fid]
+		assert.Truef(t, ok, "feature %s must exist in snapshot", fid)
+		assert.Equalf(t, StateVerified, platforms["android"].State,
+			"feature %s on android must be verified after concurrent writes", fid)
+	}
 }
 
 func TestConcurrentRegisterAndQuery(t *testing.T) {
