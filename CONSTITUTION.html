@@ -10,3 +10,33 @@ the constitution from any nested depth via its
 module stays fully decoupled and project-agnostic per §11.4.28).</p>
 <p>Canonical reference:
 https://github.com/HelixDevelopment/HelixConstitution</p>
+<h2 id="mission">Mission</h2>
+<p>DocProcessor turns project documentation into structured, queryable
+feature maps and verification-coverage data for QA automation, while
+remaining a standalone, project-not-aware, fully decoupled Go module
+(<code>digital.vasic.docprocessor</code>).</p>
+<h2 id="module-specific-mandatory-standards">Module-Specific Mandatory
+Standards</h2>
+<p>This module extends the Helix Constitution; it adds no overrides that
+relax any canonical rule. The following are concrete, code-enforced
+restatements scoped to this module:</p>
+<ul>
+<li>Decoupling: no code under <code>pkg/**</code> or <code>cmd/**</code>
+may import a consuming project’s namespace. Project-specific behaviour
+is injected only via the <code>Translator</code>, <code>LLMAgent</code>,
+and <code>Config</code> contracts.</li>
+<li>No hardcoded user-facing content: every CLI line is emitted through
+the injected <code>i18n.Translator</code>; message IDs live in
+<code>pkg/i18n/bundles/active.en.yaml</code>.
+<code>NoopTranslator</code> is a loud fallback that returns the message
+ID verbatim.</li>
+<li>Secrets hygiene: <code>.env</code> is git-ignored and must be
+<code>chmod 600</code>; only <code>.env.example</code> (placeholder
+values) is committed.</li>
+<li>Quality gates: <code>go build ./...</code> and
+<code>go vet ./...</code> must pass with zero warnings, and the full
+suite (<code>go test ./... -race</code>) — unit, integration, stress,
+security, E2E, automation — must pass against real infrastructure
+(filesystem and the real CLI binary), never via stubbed or skipped
+tests.</li>
+</ul>

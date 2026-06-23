@@ -9,3 +9,43 @@ the constitution from any nested depth via its
 module stays fully decoupled and project-agnostic per §11.4.28).</p>
 <p>Canonical reference:
 https://github.com/HelixDevelopment/HelixConstitution</p>
+<h2 id="module-identity">Module Identity</h2>
+<p>DocProcessor (<code>digital.vasic.docprocessor</code>, Go 1.25) is a
+standalone, project-not-aware, fully decoupled documentation-processing
+module. It loads project docs, builds structured feature maps, and
+tracks verification coverage for QA automation. Provider-specific and
+project-specific behaviour is injected at runtime via the
+<code>Translator</code>, <code>LLMAgent</code>, and <code>Config</code>
+contracts — the module never imports a consuming project’s
+namespace.</p>
+<h2 id="responsibilities">Responsibilities</h2>
+<ul>
+<li>Load and parse documentation (<code>pkg/loader</code>: Markdown,
+YAML, HTML, AsciiDoc, RST).</li>
+<li>Extract features and build a queryable <code>FeatureMap</code>
+(<code>pkg/feature</code>).</li>
+<li>Track per-feature verification coverage thread-safely
+(<code>pkg/coverage</code>).</li>
+<li>Build a directed inter-document link graph with JSON/Mermaid export
+(<code>pkg/docgraph</code>).</li>
+<li>Define the <code>LLMAgent</code> extraction contract and prompt
+templates (<code>pkg/llm</code>), with no hard dependency on any LLM
+provider.</li>
+<li>Externalise all user-facing strings (<code>pkg/i18n</code>) and load
+configuration (<code>pkg/config</code>).</li>
+<li>Expose a CLI:
+<code>docprocessor [--verbose|-v] &lt;docs-directory&gt;</code>.</li>
+</ul>
+<h2 id="testing-boundaries">Testing Boundaries</h2>
+<ul>
+<li>Build: <code>go build ./...</code>. Vet: <code>go vet ./...</code>
+(zero warnings).</li>
+<li>Tests: <code>go test ./... -race -count=1</code> covers unit,
+integration, stress, security, E2E, and automation suites.</li>
+<li>Integration/stress/security/E2E/automation tests run against real
+filesystems and the real CLI binary, not mocks; unit tests may use
+mocks.</li>
+<li>Agents MUST NOT weaken, stub, or skip tests, and MUST NOT introduce
+a dependency on any consuming project. Every change keeps build and vet
+green.</li>
+</ul>

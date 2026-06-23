@@ -9,3 +9,103 @@ the constitution from any nested depth via its
 module stays fully decoupled and project-agnostic per §11.4.28).</p>
 <p>Canonical reference:
 https://github.com/HelixDevelopment/HelixConstitution</p>
+<h2 id="module-overview">Module Overview</h2>
+<p>DocProcessor is a standalone, project-not-aware, fully decoupled Go
+module (<code>digital.vasic.docprocessor</code>, Go 1.25) that loads
+project documentation, builds structured feature maps, and tracks
+verification coverage for QA automation. It supports LLM-driven feature
+extraction via an injected agent and also provides heuristic extraction
+for offline use. The module imports no consuming-project namespace;
+project-specific behaviour is injected at runtime through the
+<code>Translator</code>, <code>LLMAgent</code>, and <code>Config</code>
+contracts.</p>
+<h2 id="build-test">Build &amp; Test</h2>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode bash"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> build ./...                      <span class="co"># build all packages + CLI</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> test ./...                       <span class="co"># unit + integration + stress + security + E2E + automation</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> test ./... <span class="at">-race</span> <span class="at">-count</span><span class="op">=</span>1        <span class="co"># with race detection</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">go</span> build <span class="at">-o</span> bin/docprocessor ./cmd/docprocessor</span></code></pre></div>
+<p><code>make test</code>, <code>make test-race</code>, and
+<code>make test-cover</code> wrap the above. The CLI runs as
+<code>docprocessor [--verbose|-v] &lt;docs-directory&gt;</code>.</p>
+<h2 id="package-structure">Package Structure</h2>
+<p>Seven packages under <code>pkg/</code>, plus the CLI under
+<code>cmd/docprocessor</code>:</p>
+<table>
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 81%" />
+</colgroup>
+<thead>
+<tr>
+<th>Package</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pkg/loader</code></td>
+<td>Document loading + parsing (Markdown, YAML, HTML, AsciiDoc,
+RST)</td>
+</tr>
+<tr>
+<td><code>pkg/feature</code></td>
+<td>Feature extraction + <code>FeatureMap</code> building
+(<code>DefaultBuilder</code>)</td>
+</tr>
+<tr>
+<td><code>pkg/coverage</code></td>
+<td>Thread-safe (<code>RWMutex</code>) coverage tracking</td>
+</tr>
+<tr>
+<td><code>pkg/docgraph</code></td>
+<td>Directed inter-document link graph with JSON/Mermaid export</td>
+</tr>
+<tr>
+<td><code>pkg/llm</code></td>
+<td><code>LLMAgent</code> interface + prompt templates (no provider
+dependency)</td>
+</tr>
+<tr>
+<td><code>pkg/config</code></td>
+<td>Configuration loading from <code>.env</code> files / maps</td>
+</tr>
+<tr>
+<td><code>pkg/i18n</code></td>
+<td><code>Translator</code> contract + <code>NoopTranslator</code>
+default</td>
+</tr>
+</tbody>
+</table>
+<h2 id="key-interfaces">Key Interfaces</h2>
+<ul>
+<li><code>loader.Loader</code> — load <code>loader.Document</code>
+values from the filesystem; <code>SupportedFormats()</code> reports
+handled extensions.</li>
+<li><code>feature.FeatureMapBuilder</code> —
+<code>NewBuilder(projectRoot)</code> returns a
+<code>DefaultBuilder</code>; <code>BuildFromDocs(ctx, docs)</code>
+produces a <code>*FeatureMap</code>.</li>
+<li><code>coverage.CoverageTracker</code> — <code>NewTracker()</code>;
+concurrency-safe verification status tracking.</li>
+<li><code>llm.LLMAgent</code> — injected LLM for intelligent extraction;
+no hard dependency on any provider.</li>
+<li><code>i18n.Translator</code> — externalised user-facing strings;
+<code>NoopTranslator</code> returns the message ID verbatim as a loud
+fallback.</li>
+<li><code>config.Config</code> — <code>LoadFromEnv(path)</code> /
+<code>LoadFromMap(env)</code>.</li>
+</ul>
+<h2 id="module-specific-conventions">Module-Specific Conventions</h2>
+<ul>
+<li>Decoupling: never import a consumer namespace under
+<code>pkg/**</code> or <code>cmd/**</code>.</li>
+<li>All user-facing CLI output is emitted through the injected
+<code>Translator</code> (message IDs live in
+<code>pkg/i18n/bundles/active.en.yaml</code>), never as hardcoded
+English literals.</li>
+<li><code>.env</code> is git-ignored and must be <code>chmod 600</code>;
+only <code>.env.example</code> is committed.</li>
+<li><code>go build ./...</code> and <code>go vet ./...</code> must pass
+with zero warnings.</li>
+</ul>

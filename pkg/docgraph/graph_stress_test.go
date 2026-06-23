@@ -77,6 +77,25 @@ func TestConcurrentReadWrite(t *testing.T) {
 	}
 
 	wg.Wait()
+
+	// Observable post-concurrency state assertion (no lost writes / no
+	// duplicated state). 20 nodes were pre-seeded and every writer edge
+	// connects two already-existing nodes, so the node set must be
+	// unchanged; the 10 writers each add a distinct edge, so exactly 10
+	// edges must be present and each specific edge must have landed.
+	assert.Equal(t, 20, g.NodeCount(), "node count must be stable after concurrent read/write")
+	assert.Equal(t, 10, g.EdgeCount(), "every concurrent edge write must be persisted exactly once")
+	for i := 0; i < 10; i++ {
+		from := fmt.Sprintf("node-%d", i)
+		to := fmt.Sprintf("node-%d", i+10)
+		assert.Truef(t, g.HasEdge(from, to), "edge %s -> %s written concurrently must exist", from, to)
+	}
+
+	// The exported snapshot must be internally consistent with the
+	// accessor counts (the graph invariant: snapshot reflects live state).
+	snapshot := g.Export()
+	assert.Len(t, snapshot.Nodes, g.NodeCount(), "snapshot node count must match live node count")
+	assert.Len(t, snapshot.Edges, g.EdgeCount(), "snapshot edge count must match live edge count")
 }
 
 func TestConcurrentExport(t *testing.T) {
