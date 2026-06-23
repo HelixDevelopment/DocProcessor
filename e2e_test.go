@@ -72,11 +72,11 @@ func TestE2E_FullPipeline(t *testing.T) {
 	require.NoError(t, err)
 
 	// Create documentation files
-	err = os.WriteFile(filepath.Join(dir, "README.md"), []byte(`# Yole Text Editor
+	err = os.WriteFile(filepath.Join(dir, "README.md"), []byte(`# Sample Text Editor
 
 ## Overview
 
-Yole is a cross-platform text editor supporting 17 text formats with cloud storage integration.
+Sample Text Editor is a cross-platform text editor supporting 17 text formats with cloud storage integration.
 
 ## Features
 
