@@ -8,6 +8,7 @@ package docgraph
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 	"strings"
 	"sync"
 )
@@ -177,18 +178,61 @@ func (g *DocGraph) ExportMermaid() string {
 	var sb strings.Builder
 	sb.WriteString("graph LR\n")
 
-	for _, n := range g.nodes {
+	// sanitizeMermaidID is lossy by construction: every non-alphanumeric,
+	// non-underscore byte collapses to '_', so two DISTINCT original node
+	// IDs that differ only in punctuation (e.g. "docs/api-guide.md" and
+	// "docs/api_guide.md") produce the IDENTICAL base Mermaid id. Emitting
+	// that colliding id for both would silently conflate two unrelated
+	// documents into a single visual node and scramble which edges belong
+	// to which document — a content-corrupting bug, not a cosmetic one.
+	// mermaidIDs (below) guarantees a unique Mermaid id per distinct
+	// original node ID by appending a numeric disambiguator on collision,
+	// and the exact same mapping is reused for both node declarations and
+	// edges so the exported diagram stays internally consistent. Nodes are
+	// also visited in sorted-ID order so the disambiguation outcome (and
+	// the rest of the rendered diagram) is deterministic across runs,
+	// rather than depending on Go's randomized map iteration order.
+	ids := make([]string, 0, len(g.nodes))
+	for id := range g.nodes {
+		ids = append(ids, id)
+	}
+	sort.Strings(ids)
+
+	mermaidIDs := make(map[string]string, len(ids))
+	used := make(map[string]bool, len(ids))
+	for _, id := range ids {
+		base := sanitizeMermaidID(id)
+		final := base
+		for n := 2; used[final]; n++ {
+			final = fmt.Sprintf("%s_%d", base, n)
+		}
+		used[final] = true
+		mermaidIDs[id] = final
+	}
+
+	for _, id := range ids {
+		n := g.nodes[id]
 		label := n.Title
 		if label == "" {
 			label = n.ID
 		}
 		// Sanitize label for Mermaid
 		label = strings.ReplaceAll(label, "\"", "'")
-		sb.WriteString(fmt.Sprintf("    %s[\"%s\"]\n", sanitizeMermaidID(n.ID), label))
+		sb.WriteString(fmt.Sprintf("    %s[\"%s\"]\n", mermaidIDs[id], label))
 	}
 
 	for _, e := range g.edges {
-		sb.WriteString(fmt.Sprintf("    %s --> %s\n", sanitizeMermaidID(e.From), sanitizeMermaidID(e.To)))
+		from, ok := mermaidIDs[e.From]
+		if !ok {
+			// Defensive only: AddEdge always creates both endpoint nodes,
+			// so every edge's From/To is present in mermaidIDs above.
+			from = sanitizeMermaidID(e.From)
+		}
+		to, ok := mermaidIDs[e.To]
+		if !ok {
+			to = sanitizeMermaidID(e.To)
+		}
+		sb.WriteString(fmt.Sprintf("    %s --> %s\n", from, to))
 	}
 
 	return sb.String()
