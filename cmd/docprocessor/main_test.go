@@ -261,6 +261,79 @@ func TestRunCLI_NoopTranslator_EmitsMsgIDVerbatim(t *testing.T) {
 	}
 }
 
+// TestRunCLI_PlatformAndCategoryLines_AreDeterministicAcrossRuns is a
+// reproduce-first RED test for a non-determinism defect: runCLI iterates
+// `fm.Categories` and `fm.PlatformMatrix` directly with `for k, v := range
+// aMap`, and Go deliberately RANDOMIZES map iteration order on every
+// iteration (a documented, intentional Go runtime behavior — never a flaky
+// test artifact). The heuristically-extracted feature always carries the
+// SAME 3 platforms ("android", "desktop", "web"), so `fm.PlatformMatrix`
+// always has exactly those 3 keys — yet the ORDER the CLI prints their
+// "Platform ..." lines in is not stable: two runs of the identical CLI
+// invocation, against the identical docs directory, in the same process,
+// can and do print those 3 lines in a different relative order.
+//
+// This is a real end-user-visible defect: any downstream consumer that
+// diffs, snapshot-tests, or greps CLI output for a stable line sequence
+// (CI logs, golden-file tests, `docprocessor --verbose | diff prev.txt -`)
+// gets spurious differences for byte-identical input, purely from Go's
+// map-iteration randomization — never from any change in the underlying
+// document set. It uses the REAL production BundleTranslator (not a mock)
+// so the reproduction is the exact string sequence an operator sees.
+func TestRunCLI_PlatformAndCategoryLines_AreDeterministicAcrossRuns(t *testing.T) {
+	docsDir := t.TempDir()
+	docPath := filepath.Join(docsDir, "multi_platform.md")
+	body := "# Multi Platform\n\n## Some Feature\n\n" +
+		"A description long enough to pass the twenty character heuristic gate for feature extraction.\n"
+	if err := os.WriteFile(docPath, []byte(body), 0o644); err != nil {
+		t.Fatalf("write seed doc: %v", err)
+	}
+
+	tr, err := i18n.NewBundleTranslator("en")
+	if err != nil {
+		t.Fatalf("NewBundleTranslator: %v", err)
+	}
+
+	extractOrder := func(out, prefix string) []string {
+		var order []string
+		for _, line := range strings.Split(out, "\n") {
+			if strings.Contains(line, prefix) {
+				order = append(order, strings.TrimSpace(line))
+			}
+		}
+		return order
+	}
+
+	const runs = 40
+	var firstPlatformOrder []string
+	mismatch := false
+	for i := 0; i < runs; i++ {
+		var stdout, stderr bytes.Buffer
+		rc := runCLI(context.Background(), []string{"docprocessor", "--verbose", docsDir}, &stdout, &stderr, tr)
+		if rc != 0 {
+			t.Fatalf("run %d: exit code = %d (stderr=%q)", i, rc, stderr.String())
+		}
+		order := extractOrder(stdout.String(), "  Platform ")
+		if len(order) != 3 {
+			t.Fatalf("run %d: expected 3 platform lines (android, desktop, web), got %v", i, order)
+		}
+		if firstPlatformOrder == nil {
+			firstPlatformOrder = order
+			continue
+		}
+		if strings.Join(order, "|") != strings.Join(firstPlatformOrder, "|") {
+			mismatch = true
+			t.Logf("run %d: platform-line order differs from run 0:\n  run 0: %v\n  run %d: %v", i, firstPlatformOrder, i, order)
+		}
+	}
+
+	if mismatch {
+		t.Fatalf("platform-line print order is not deterministic across %d identical runCLI invocations "+
+			"against the same unchanged docs directory (run 0 order=%v); this makes CLI output diff-unstable "+
+			"for byte-identical input", runs, firstPlatformOrder)
+	}
+}
+
 // TestRunCLI_BundleContainsAllRound209MsgIDs is the paired-mutation
 // integrity check for the YAML bundle. It loads active.en.yaml and
 // asserts every round 209 message ID is present. Planting a typo in

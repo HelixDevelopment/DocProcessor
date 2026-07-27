@@ -26,3 +26,6 @@ coverage.html
 Thumbs.db
 
 reports/demos/
+
+# Ad-hoc audit RED/GREEN evidence captures (not a tracked test artifact)
+qa-results/

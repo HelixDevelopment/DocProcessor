@@ -9,6 +9,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"time"
 
@@ -115,16 +116,34 @@ func runCLI(ctx context.Context, args []string, stdout, stderr io.Writer, tr i18
 		"edges": fm.DocGraph.EdgeCount(),
 	}))
 
-	for cat, features := range fm.Categories {
+	// Iterate in sorted-key order, never raw map-range order. Go
+	// deliberately randomizes map iteration order on every range call, so
+	// printing fm.Categories / fm.PlatformMatrix directly made the CLI's
+	// "Category ..." / "Platform ..." line sequence vary between two runs
+	// against byte-identical input — a diff-unstable, non-deterministic
+	// output defect (violates reproducible-output expectations any golden-
+	// file / CI-log diff relies on).
+	categoryNames := make([]string, 0, len(fm.Categories))
+	for cat := range fm.Categories {
+		categoryNames = append(categoryNames, string(cat))
+	}
+	sort.Strings(categoryNames)
+	for _, cat := range categoryNames {
 		fprintln(stdout, tr.T(ctx, "docprocessor_cli_category_line", map[string]any{
-			"category": string(cat),
-			"count":    len(features),
+			"category": cat,
+			"count":    len(fm.Categories[feature.FeatureCategory(cat)]),
 		}))
 	}
-	for platform, features := range fm.PlatformMatrix {
+
+	platformNames := make([]string, 0, len(fm.PlatformMatrix))
+	for platform := range fm.PlatformMatrix {
+		platformNames = append(platformNames, platform)
+	}
+	sort.Strings(platformNames)
+	for _, platform := range platformNames {
 		fprintln(stdout, tr.T(ctx, "docprocessor_cli_platform_line", map[string]any{
 			"platform": platform,
-			"count":    len(features),
+			"count":    len(fm.PlatformMatrix[platform]),
 		}))
 	}
 
