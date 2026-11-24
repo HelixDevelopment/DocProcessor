@@ -6,6 +6,7 @@ package feature
 import (
 	"context"
 	"fmt"
+	"unicode/utf8"
 
 	"digital.vasic.docprocessor/pkg/llm"
 	"digital.vasic.docprocessor/pkg/loader"
@@ -171,9 +172,13 @@ func extractFeaturesHeuristic(section loader.Section, docPath string) []Feature 
 	return []Feature{f}
 }
 
+// truncate shortens s to at most maxLen runes, appending "..." when it cuts.
+// It counts and slices by RUNE, never by byte, so multibyte UTF-8 text
+// (e.g. Cyrillic) is never split mid-rune into corrupted output.
 func truncate(s string, maxLen int) string {
-	if len(s) <= maxLen {
+	if utf8.RuneCountInString(s) <= maxLen {
 		return s
 	}
-	return s[:maxLen] + "..."
+	runes := []rune(s)
+	return string(runes[:maxLen]) + "..."
 }

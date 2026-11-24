@@ -239,6 +239,70 @@ func TestExportMermaid_EmptyGraph(t *testing.T) {
 	assert.Equal(t, "graph LR\n", mermaid)
 }
 
+// TestExportMermaid_DistinctIDsMustNotCollide is a reproduce-first RED test
+// for the Mermaid-ID-collision class: sanitizeMermaidID maps every
+// non-alphanumeric byte to '_', so two DISTINCT original node IDs whose
+// only difference is punctuation (a hyphen vs an underscore, a slash vs a
+// dot) sanitize to the IDENTICAL Mermaid node id. "docs/api-guide.md" and
+// "docs/api_guide.md" are two real, independently-added documents in this
+// graph, yet both sanitize to "docs_api_guide_md".
+//
+// Before the fix, ExportMermaid emitted TWO node-declaration lines sharing
+// that one colliding id — Mermaid silently renders only one visual node for
+// what are two distinct documents, and worse, an edge meant for the SECOND
+// document renders as if it belongs to the FIRST (or vice versa) because
+// both endpoints resolve to the same id. This is silent content corruption
+// of the generated diagram, not a cosmetic quirk — exactly the transform
+// gap the anti-bluff covenant forbids (a "transform" that silently merges
+// distinct content).
+func TestExportMermaid_DistinctIDsMustNotCollide(t *testing.T) {
+	g := New()
+	g.AddNode("docs/api-guide.md", "API Guide (hyphen)")
+	g.AddNode("docs/api_guide.md", "API Guide (underscore)")
+	g.AddEdge("docs/api-guide.md", "docs/other.md")
+	g.AddEdge("docs/api_guide.md", "docs/other.md")
+
+	// Precondition: the two original IDs really do collide under the raw
+	// sanitizer — if this ever stops being true the test is testing the
+	// wrong scenario.
+	require.Equal(t, sanitizeMermaidID("docs/api-guide.md"), sanitizeMermaidID("docs/api_guide.md"),
+		"precondition: these two distinct doc IDs must collide under the raw per-string sanitizer")
+
+	mermaid := g.ExportMermaid()
+
+	// The exported diagram MUST declare one node line per distinct graph
+	// node (3 nodes: the two api-guide docs + "docs/other.md"). Count the
+	// node-declaration lines (the `id["label"]` lines, not edge lines).
+	nodeLines := 0
+	for _, line := range strings.Split(mermaid, "\n") {
+		if strings.Contains(line, "[\"") {
+			nodeLines++
+		}
+	}
+	assert.Equal(t, g.NodeCount(), nodeLines,
+		"ExportMermaid must emit exactly one node-declaration line per distinct node; "+
+			"a lower count means two distinct nodes were silently merged under a colliding Mermaid id:\n%s", mermaid)
+
+	// Both original node labels must be individually present and distinctly
+	// addressable — not merged into a single visual node.
+	assert.Contains(t, mermaid, "API Guide (hyphen)")
+	assert.Contains(t, mermaid, "API Guide (underscore)")
+
+	// Both edges (api-guide-hyphen -> other, api-guide-underscore -> other)
+	// must render as two DISTINCT edge lines with two DISTINCT source ids —
+	// not two edges that both accidentally read as coming from the same
+	// (colliding) source id.
+	var edgeLines []string
+	for _, line := range strings.Split(mermaid, "\n") {
+		if strings.Contains(line, "-->") {
+			edgeLines = append(edgeLines, strings.TrimSpace(line))
+		}
+	}
+	require.Len(t, edgeLines, 2, "expected exactly 2 edge lines:\n%s", mermaid)
+	assert.NotEqual(t, edgeLines[0], edgeLines[1],
+		"the two edges must be distinguishable by source id, not collapsed to the same line:\n%s", mermaid)
+}
+
 func TestNeighbors_NonexistentNode(t *testing.T) {
 	g := New()
 	neighbors := g.Neighbors("nonexistent")

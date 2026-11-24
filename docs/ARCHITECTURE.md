@@ -1,88 +1,156 @@
 # DocProcessor Architecture
 
-## Overview
+**Module:** `digital.vasic.docprocessor`
 
-Go module (`digital.vasic.docprocessor`) for loading project documentation, building structured feature maps, and tracking verification coverage. Part of the HelixQA ecosystem -- provides the "what to test" knowledge base that drives autonomous QA sessions.
+DocProcessor loads project documentation, extracts structured feature maps, tracks
+verification coverage, and builds inter-document link graphs. It is designed for
+injection into QA pipelines (e.g., HelixQA autonomous sessions) but also runs
+standalone via `cmd/docprocessor`.
 
-## Package Structure
+---
 
-```
-pkg/
-  loader/     -- Document loading (Markdown, YAML) with recursive directory scanning
-  feature/    -- Feature map building with categories, screens, and test steps
-  coverage/   -- Thread-safe verification tracking with evidence and issue reporting
-  docgraph/   -- Document relationship graph with JSON/Mermaid export
-  llm/        -- LLM agent interface for AI-assisted feature extraction
-  config/     -- Configuration from .env files
-cmd/
-  docprocessor/ -- CLI entry point
-```
+## Package Overview
 
-## Document Processing Pipeline
+| Package | Role |
+|---------|------|
+| `pkg/loader` | Document discovery and parsing |
+| `pkg/feature` | Feature extraction and FeatureMap construction |
+| `pkg/coverage` | Thread-safe verification coverage tracking |
+| `pkg/docgraph` | Inter-document link graph with export |
+| `pkg/llm` | Injected LLM interface for intelligent extraction |
+| `pkg/config` | Configuration from `.env` files |
+| `pkg/i18n` | `Translator` contract for CLI message localization |
 
-```
-Project docs (Markdown, YAML)
-       |
-  Loader.LoadDir(path)
-       |
-  []Document (parsed sections, links, metadata)
-       |
-  FeatureMapBuilder.Build(documents)
-    +-- LLMAgent.ExtractFeatures() (optional, AI-assisted)
-    +-- Category classification
-    +-- Screen association
-    +-- Test step generation
-       |
-  FeatureMap
-       |
-  CoverageTracker.Track(featureMap)
-    +-- Per-platform verification status
-    +-- Evidence collection (screenshots, videos, logs)
-    +-- Issue tracking
-       |
-  CoverageReport
+---
+
+## Processing Pipeline
+
+```mermaid
+flowchart LR
+    A[Filesystem Scan] --> B[Loader]
+    B --> C[Parse Sections]
+    C --> D{LLMAgent?}
+    D -- yes --> E[LLM Extraction]
+    D -- no --> F[Heuristic Extraction]
+    E --> G[FeatureMapBuilder]
+    F --> G
+    G --> H[FeatureMap]
+    H --> I[CoverageTracker]
+    H --> J[DocGraph]
 ```
 
-## Key Types
+1. **Scan** — `loader.Scanner` walks the project tree using the format list from
+   `pkg/config` (`HELIX_DOCS_FORMATS` env var; defaults to `md, yaml, html, adoc, rst`)
+   and the `HELIX_DOCS_ROOT` setting.
+2. **Load & Parse** — `loader.Loader` reads each file (max 10 MB), splits it into
+   `Section` structs with headings, bodies, and cross-reference links. Active structured
+   parsers exist for **Markdown** and **YAML** only; other accepted extensions are stored
+   as raw content with the first line as the title.
+3. **Extract Features** — `feature.FeatureMapBuilder` runs heuristic extraction by
+   default. When an `llm.LLMAgent` is injected it calls `ExtractFeatures` on the
+   agent and parses `RawFeature` responses.
+4. **Build FeatureMap** — Extracted features are deduplicated (deterministic IDs via
+   `GenerateID`), categorised, and assembled into a queryable `FeatureMap` with a
+   platform matrix.
+5. **Enrich** — The optional LLM pass infers UI screens and generates test step
+   suggestions for each feature.
+6. **Track Coverage** — `coverage.CoverageTracker` records per-platform verification
+   status, stores `Evidence`, and produces `CoverageReport` snapshots.
 
-### Loader
+---
 
-`Loader` interface with `LoadDir()` and `LoadFile()`. Parses Markdown into `Document` structs containing `Section` objects (title, level, content, line number) and extracted links. Supports Markdown and YAML formats. Max file size: 10 MB.
+## Loader Pipeline
 
-### Feature
+`loader.Loader` accepts a root path and a format list. Internally it uses:
 
-`Feature` has a deterministic ID (`GenerateID(name)` -- slug with hash suffix for long names), category, associated screen, and test steps. Eight categories: format, ui, network, settings, storage, auth, editor, other.
+- **Markdown parser** — extracts ATX/setext headings and fenced code blocks.
+- **YAML parser** — unmarshals structured docs via `gopkg.in/yaml.v3`.
 
-`FeatureMapBuilder` constructs a `FeatureMap` from documents, optionally using an `LLMAgent` to extract features from unstructured text.
+For other accepted extensions (html, adoc, rst) the loader stores raw content
+with the first line used as the document title and a single top-level section.
 
-### Coverage
+All paths return `[]loader.Document` with `[]Section` slices.
 
-`CoverageTracker` is thread-safe (`sync.RWMutex`). Tracks per-feature, per-platform verification state:
-- **States**: unverified, verified, failed, skipped
-- **Evidence**: screenshot path, video path + offset, log path, timestamp, description
-- **Issues**: type (visual/ux/accessibility/functional/performance/crash), severity, evidence links
+---
 
-`CoverageReport` aggregates coverage percentages by platform and category.
+## Feature Extraction
 
-### DocGraph
+`feature.FeatureMapBuilder` operates in two modes:
 
-Directed graph of document relationships. Nodes are documents, edges are references (links between docs). Thread-safe via `sync.RWMutex`. Exports to JSON and Mermaid diagram format.
+- **Heuristic** — Keyword scoring against section headings and bodies to assign
+  a `FeatureCategory` and detect platform tags (android, web, desktop).
+- **LLM-powered** — Sends structured prompts to the injected `llm.LLMAgent` and
+  deserialises the returned `[]RawFeature` slice into `Feature` structs.
 
-### LLM Agent
+Feature IDs are deterministic: short names become slugs; long names are slug + 6-char
+SHA256 suffix, ensuring stable references across pipeline runs.
 
-`LLMAgent` is an injected interface with no module-level dependency on LLMOrchestrator:
+### FeatureCategory values
+
+The eight valid categories defined in `pkg/feature/feature.go` are:
+
+| Constant | Value |
+|----------|-------|
+| `CategoryFormat` | `format` |
+| `CategoryUI` | `ui` |
+| `CategoryNetwork` | `network` |
+| `CategorySettings` | `settings` |
+| `CategoryStorage` | `storage` |
+| `CategoryAuth` | `auth` |
+| `CategoryEditor` | `editor` |
+| `CategoryOther` | `other` |
+
+---
+
+## Coverage Tracking
+
+`coverage.CoverageTracker` is fully thread-safe:
+
+- Read paths (`Coverage`, `CoverageByPlatform`, `CoverageByCategory`, `Unverified`) use `sync.RWMutex.RLock()`.
+- Write paths (`MarkVerified`, `MarkFailed`, `MarkSkipped`, `RegisterFeature`) use `Lock()`.
+
+A `CoverageReport` snapshot captures per-feature, per-platform status at a point in
+time and is serialisable to JSON for downstream consumers (e.g., HelixQA reporter).
+
+---
+
+## DocGraph
+
+`pkg/docgraph.DocGraph` maintains a directed graph of document nodes and typed edges
+(reference, include, related). It is protected by `sync.RWMutex` and can export to:
+
+- **JSON** — full node/edge list for programmatic consumers.
+- **Mermaid** — `flowchart LR` diagram for documentation embedding.
+
+---
+
+## LLMAgent Interface
 
 ```go
 type LLMAgent interface {
-    ExtractFeatures(ctx context.Context, doc Document) ([]RawFeature, error)
+    ExtractFeatures(ctx context.Context, text string) ([]RawFeature, error)
 }
 ```
 
-Prompt templates in `pkg/llm/prompts.go` guide the LLM to extract structured feature data from documentation.
+The interface carries no module-level dependency on LLMOrchestrator or any concrete
+provider. Callers inject a conforming implementation at construction time, keeping
+DocProcessor buildable and testable without any LLM credentials.
 
-## Key Design Decisions
+The full `LLMAgent` interface in `pkg/llm/agent.go` also exposes `Summarize`,
+`ClassifyFeature`, `InferScreens`, and `GenerateTestSteps`; `ExtractFeatures` is
+the primary entry point for feature extraction.
 
-- **Interface injection** for LLM: DocProcessor has zero dependency on LLMOrchestrator or any specific LLM SDK. The agent is provided at runtime.
-- **Thread-safe tracking**: Both `CoverageTracker` and `DocGraph` use `sync.RWMutex` because HelixQA updates them concurrently from multiple device test sessions.
-- **Deterministic IDs**: Feature IDs are derived from names via slugification + SHA256 hash suffix, ensuring stability across runs.
-- **Max file size limit**: 10 MB prevents memory exhaustion on accidentally included binary files.
+---
+
+## Key Exported Types
+
+| Type | Package | Role |
+|------|---------|------|
+| `Loader` (interface) | `pkg/loader` | Load documents from the filesystem |
+| `DefaultLoader` | `pkg/loader` | Concrete `Loader` implementation |
+| `FeatureMapBuilder` (interface) | `pkg/feature` | Build and enrich `FeatureMap` from docs |
+| `DefaultBuilder` | `pkg/feature` | Concrete `FeatureMapBuilder` implementation |
+| `CoverageTracker` (interface) | `pkg/coverage` | Thread-safe coverage tracking |
+| `DocGraph` | `pkg/docgraph` | Inter-document link graph |
+| `LLMAgent` (interface) | `pkg/llm` | Injectable LLM for intelligent extraction |
+| `Translator` (interface) | `pkg/i18n` | CLI message-localization contract |

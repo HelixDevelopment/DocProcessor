@@ -89,9 +89,9 @@ func TestFeatureMap_AddFeature(t *testing.T) {
 	fm := NewFeatureMap("/root")
 
 	f := Feature{
-		ID:       "feat-test",
-		Name:     "Test Feature",
-		Category: CategoryUI,
+		ID:        "feat-test",
+		Name:      "Test Feature",
+		Category:  CategoryUI,
 		Platforms: []string{"android", "desktop"},
 	}
 	fm.AddFeature(f)

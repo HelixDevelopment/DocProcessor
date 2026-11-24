@@ -262,6 +262,40 @@ func TestParseMarkdown_NestedHeadings(t *testing.T) {
 	}
 }
 
+// TestParseMarkdown_FencedCodeHeadingNotASection is a §11.4.115 RED-baseline-on-the-
+// broken-artifact regression guard for the fenced-code-block heading defect:
+// a `#`-prefixed line INSIDE a ``` fenced code block (e.g. a shell comment) was
+// wrongly parsed as a Markdown heading/section, which (a) fabricated a phantom
+// section titled with the code-comment text, (b) truncated the real preceding
+// section's Content at the opening fence (genuine content loss), and (c)
+// misattributed the prose after the code block to the phantom section.
+func TestParseMarkdown_FencedCodeHeadingNotASection(t *testing.T) {
+	content := "# Real Title\n\nIntro text.\n\n```sh\n# this is a shell comment, not a heading\necho hi\n```\n\nMore intro after code.\n"
+	title, sections, _ := parseMarkdown(content)
+
+	assert.Equal(t, "Real Title", title)
+	// Exactly ONE real heading exists; the `#` inside the fence must NOT become a section.
+	require.Len(t, sections, 1, "fenced-code `#` line must not be parsed as a heading")
+	assert.Equal(t, "Real Title", sections[0].Title)
+	// The phantom comment-title must never appear.
+	for _, s := range sections {
+		assert.NotContains(t, s.Title, "shell comment", "code-comment text leaked into a section title")
+	}
+	// No content loss: the real section's Content must retain the prose that
+	// followed the code block AND the code block itself.
+	assert.Contains(t, sections[0].Content, "More intro after code.", "prose after code block was lost/misattributed")
+	assert.Contains(t, sections[0].Content, "echo hi", "code-block body was lost from section content")
+}
+
+// TestParseMarkdown_TildeFencedCodeHeadingNotASection covers the `~~~` fence variant.
+func TestParseMarkdown_TildeFencedCodeHeadingNotASection(t *testing.T) {
+	content := "# Title\n\n~~~\n## not a heading inside tilde fence\n~~~\n\nafter.\n"
+	_, sections, _ := parseMarkdown(content)
+	require.Len(t, sections, 1)
+	assert.Equal(t, "Title", sections[0].Title)
+	assert.Contains(t, sections[0].Content, "after.")
+}
+
 func TestParseMarkdown_DeduplicateLinks(t *testing.T) {
 	content := "[link](https://example.com) and [link](https://example.com) again"
 	_, _, links := parseMarkdown(content)

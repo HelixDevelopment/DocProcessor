@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestConcurrentAddNodes(t *testing.T) {
@@ -77,6 +78,25 @@ func TestConcurrentReadWrite(t *testing.T) {
 	}
 
 	wg.Wait()
+
+	// Observable post-concurrency state assertion (no lost writes / no
+	// duplicated state). 20 nodes were pre-seeded and every writer edge
+	// connects two already-existing nodes, so the node set must be
+	// unchanged; the 10 writers each add a distinct edge, so exactly 10
+	// edges must be present and each specific edge must have landed.
+	assert.Equal(t, 20, g.NodeCount(), "node count must be stable after concurrent read/write")
+	assert.Equal(t, 10, g.EdgeCount(), "every concurrent edge write must be persisted exactly once")
+	for i := 0; i < 10; i++ {
+		from := fmt.Sprintf("node-%d", i)
+		to := fmt.Sprintf("node-%d", i+10)
+		assert.Truef(t, g.HasEdge(from, to), "edge %s -> %s written concurrently must exist", from, to)
+	}
+
+	// The exported snapshot must be internally consistent with the
+	// accessor counts (the graph invariant: snapshot reflects live state).
+	snapshot := g.Export()
+	assert.Len(t, snapshot.Nodes, g.NodeCount(), "snapshot node count must match live node count")
+	assert.Len(t, snapshot.Edges, g.EdgeCount(), "snapshot edge count must match live edge count")
 }
 
 func TestConcurrentExport(t *testing.T) {
@@ -100,6 +120,20 @@ func TestConcurrentExport(t *testing.T) {
 	}
 
 	wg.Wait()
+
+	// Observable post-join assertion: 20 concurrent exporters read the graph
+	// while it was repeatedly exported; no export may corrupt or lose graph
+	// state. The final snapshot must reflect the full seeded topology
+	// (30 nodes, 29 chain edges) and match the live accessor counts.
+	assert.Equal(t, 30, g.NodeCount(), "all 30 seeded nodes must survive concurrent export")
+	assert.Equal(t, 29, g.EdgeCount(), "all 29 seeded edges must survive concurrent export")
+	snapshot := g.Export()
+	assert.Len(t, snapshot.Nodes, 30, "final snapshot node count must equal seeded 30")
+	assert.Len(t, snapshot.Edges, 29, "final snapshot edge count must equal seeded 29")
+	jsonOut, err := g.ExportJSON()
+	require.NoError(t, err, "final ExportJSON must succeed on the post-concurrency graph")
+	assert.NotEmpty(t, jsonOut, "final ExportJSON must be non-empty")
+	assert.NotEmpty(t, g.ExportMermaid(), "final ExportMermaid must be non-empty")
 }
 
 func TestConcurrentNeighbors(t *testing.T) {
