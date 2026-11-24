@@ -189,6 +189,7 @@ exited 0.
 - [`CONSTITUTION.md`](CONSTITUTION.md) — module-specific tightenings on top of the canonical root.
 - [`CLAUDE.md`](CLAUDE.md) — AI-agent operating manual (cascaded from constitution submodule per CONST-049).
 - [`AGENTS.md`](AGENTS.md) — generic agent manual peer of CLAUDE.md.
+- [`docs/governance/main_86f1a98_carrier_backfill_archive.md`](docs/governance/main_86f1a98_carrier_backfill_archive.md) — archived copy (not binding) of the constitution text that commit 86f1a98 added to AGENTS.md and CLAUDE.md on `main`; whether to keep it is an open owner decision.
 - Canonical root: [HelixConstitution](https://github.com/HelixDevelopment/HelixConstitution).
 
 ## Decoupling guarantee (CONST-051(B))
